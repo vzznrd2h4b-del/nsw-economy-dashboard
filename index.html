@@ -1,0 +1,801 @@
+<!doctype html>
+<html lang="en-AU">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>NSW Economy and Budget Dashboard</title>
+<meta name="description" content="The NSW economy and state budget in one place: jobs, prices, wages, housing, population, the budget, debt and infrastructure, updated daily from the ABS, RBA, ASIC and NSW Budget papers.">
+<meta property="og:title" content="NSW Economy and Budget Dashboard">
+<meta property="og:description" content="Jobs, prices, wages, housing, population and the NSW budget, updated daily from official sources.">
+<meta property="og:type" content="website">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%231f4fa3'/%3E%3Cpath d='M7 22l6-7 5 4 7-9' stroke='white' stroke-width='3' fill='none' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Source+Serif+4:opsz,wght@8..60,400;8..60,500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<script src="assets/dash.js"></script>
+<style>
+:root {
+  color-scheme: light;
+  --font-anthropic-sans: "Inter", system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  --font-anthropic-serif: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --color-fg: #1b1c1f; --color-fg-muted: #5d6068; --color-bg: #f6f6f3; --color-panel: #ffffff; --color-border-line: #e2e2dc;
+  --color-ok: #1f7a4a; --color-warn: #a86400; --color-bad: #c0392b;
+  --c1: #1f5fbf; --c2: #d2742a; --c3: #2f9566; --c4: #8a55b8; --c5: #c4466a; --c6: #6b8e23; --c7: #b8901a; --c8: #5c7686;
+  --cds-chart-muted: #b6b6ae; --cds-chart-grid: #ececE6; --cds-chart-axis: #b9b9b2; --cds-chart-reference: #85857e; --cds-chart-status-critical: var(--color-bad);
+  --cds-surface-popover: #ffffff; --cds-border: #dcdcd5; --cds-shadow-popover: 0 6px 20px rgba(0,0,0,.12); --cds-text-secondary: #6b6e75;
+  --cds-font-size-caption: 12.5px; --cds-font-size-body: 14.5px; --cds-font-size-heading: 18px; --cds-font-size-title: 28px; --cds-font-weight-medium: 600;
+  --cds-gap-xs: 4px; --cds-gap-sm: 8px; --cds-gap-md: 14px; --cds-gap-lg: 22px; --cds-gap-xl: 36px;
+  --cds-pad-xs: 4px; --cds-pad-sm: 8px; --cds-pad-md: 14px; --cds-pad-lg: 18px; --cds-pad-xl: 28px;
+  --cds-radius: 10px; --cds-dur-slow: .3s;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  color-scheme: dark;
+  --color-fg: #ececE8; --color-fg-muted: #a5a7ad; --color-bg: #151618; --color-panel: #1f2023; --color-border-line: #34363b;
+  --color-ok: #4cbf86; --color-warn: #e0a64a; --color-bad: #f0796a;
+  --c1: #6fa5ef; --c2: #f0a35e; --c3: #5fc794; --c4: #b48ae0; --c5: #ec84a0; --c6: #a3c45a; --c7: #e3c25a; --c8: #94aebc;
+  --cds-chart-muted: #5a5c62; --cds-chart-grid: #2b2d31; --cds-chart-axis: #4a4c52; --cds-chart-reference: #8d8f95;
+  --cds-surface-popover: #26282c; --cds-border: #3c3e44; --cds-shadow-popover: 0 6px 20px rgba(0,0,0,.45); --cds-text-secondary: #9fa1a7;
+} }
+html, body { margin: 0; background: var(--color-bg); color: var(--color-fg); }
+body { font-family: var(--font-anthropic-sans); -webkit-font-smoothing: antialiased; }
+#dash-root { padding: clamp(16px, 3vw, 36px) clamp(16px, 3vw, 36px) 56px; }
+.td-asof { margin: var(--cds-gap-xs) 0 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.site-foot { max-width: 1400px; margin: var(--cds-gap-xl) auto 0; padding-top: var(--cds-pad-md); border-top: 1px solid var(--color-border-line); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); line-height: 1.6; }
+.site-foot a, #tb-sources a { color: inherit; }
+.dash-skeleton:empty { background: linear-gradient(90deg, var(--color-border-line) 0%, color-mix(in srgb, var(--color-border-line) 40%, transparent) 50%, var(--color-border-line) 100%); background-size: 200% 100%; border-radius: var(--cds-radius); opacity: .5; }
+@media (prefers-reduced-motion: no-preference) { .dash-skeleton:empty { animation: sk 1.4s ease-in-out infinite; } }
+@keyframes sk { from { background-position: 200% 0; } to { background-position: -200% 0; } }
+
+
+.td { font-family: var(--font-anthropic-sans); color: var(--color-fg); max-width: 1400px; margin-inline: auto; }
+.td-head { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: var(--cds-gap-md); padding-bottom: var(--cds-pad-md); border-bottom: 1px solid var(--color-border-line); margin-bottom: var(--cds-gap-lg); }
+.td-title { font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); margin: 0; line-height: 1.15; }
+.td-sub { margin: var(--cds-gap-xs) 0 0; color: var(--color-fg-muted); font-size: var(--cds-font-size-body); max-width: 72ch; }
+.td .td-sub b { font-weight: 500; color: var(--color-fg); }
+.td-tabs { display: flex; gap: var(--cds-gap-xs); flex-wrap: wrap; }
+.td-tab { font: inherit; font-size: var(--cds-font-size-body); padding: var(--cds-pad-xs) var(--cds-pad-md); border-radius: 999px; border: 1px solid var(--color-border-line); background: transparent; color: var(--color-fg-muted); cursor: pointer; }
+.td-tab[aria-selected="true"] { background: var(--color-fg); color: var(--color-bg); border-color: var(--color-fg); }
+.td-page[hidden] { display: none; }
+.td-h2 { font-size: var(--cds-font-size-heading); font-weight: var(--cds-font-weight-medium); margin: var(--cds-gap-xl) 0 var(--cds-gap-xs); }
+.td-h2:first-child { margin-top: 0; }
+.td-lede { margin: 0 0 var(--cds-gap-md); color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.td-key { display: flex; gap: var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin: 0 0 var(--cds-gap-md); flex-wrap: wrap; }
+.td-key span::before { content: ""; display: inline-block; width: .55rem; height: .55rem; border-radius: 50%; margin-right: .35rem; vertical-align: middle; background: var(--cds-chart-muted); }
+.td-key .k-good::before { background: var(--color-ok); }
+.td-key .k-bad::before { background: var(--color-bad); }
+.td-group { font-size: var(--cds-font-size-caption); text-transform: uppercase; letter-spacing: .06em; color: var(--color-fg-muted); margin: var(--cds-gap-lg) 0 var(--cds-gap-sm); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 13.5rem), 1fr)); gap: var(--cds-gap-md); }
+.tile { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-md); display: flex; flex-direction: column; gap: 2px; position: relative; overflow: hidden; }
+.tile::before { content: ""; position: absolute; inset: 0 auto 0 0; width: 4px; background: var(--cds-chart-muted); }
+.tile.tone-good::before { background: var(--color-ok); }
+.tile.tone-bad::before { background: var(--color-bad); }
+.tile-l { margin: 0; font-size: var(--cds-font-size-caption); font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); }
+.tile-v { margin: 2px 0 0; font-family: var(--font-anthropic-serif); font-weight: 400; font-size: var(--cds-font-size-title); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.tile-p { margin: 0; font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.tile-c { display: grid; grid-template-columns: 1fr 1fr; gap: var(--cds-gap-sm); margin-top: var(--cds-gap-sm); padding-top: var(--cds-gap-sm); border-top: 1px solid var(--color-border-line); font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+.tile-c div { display: flex; flex-direction: column; min-width: 0; }
+.tile-c .cl { color: var(--color-fg-muted); }
+.tile-c .cv { font-weight: var(--cds-font-weight-medium); }
+.grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr)); gap: var(--cds-gap-md); }
+.card { background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); min-width: 0; }
+.card h3 { margin: 0; font-size: var(--cds-font-size-body); font-weight: var(--cds-font-weight-medium); }
+.card .note { margin: 2px 0 var(--cds-gap-sm); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.chart { position: relative; min-height: 220px; }
+.chart.tall { min-height: 280px; }
+.chart svg { display: block; overflow: visible; }
+.chart .gl { stroke: var(--cds-chart-grid); stroke-width: 1; }
+.chart .zl { stroke: var(--cds-chart-axis); stroke-width: 1; }
+.chart .rl { stroke: var(--cds-chart-reference); stroke-width: 1; stroke-dasharray: 4 3; }
+.chart .tk { fill: var(--color-fg-muted); font-size: var(--cds-font-size-caption); font-family: var(--font-anthropic-sans); }
+.chart .ln { fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+.legend { display: flex; flex-wrap: wrap; gap: var(--cds-gap-xs) var(--cds-gap-md); font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); margin-top: var(--cds-gap-xs); }
+.legend .sw { display: inline-block; width: .9rem; height: 3px; border-radius: 2px; margin-right: .35rem; vertical-align: middle; background: var(--c, var(--cds-chart-muted)); }
+.legend .sw.dash { background: repeating-linear-gradient(90deg, var(--c, var(--cds-chart-muted)) 0 4px, transparent 4px 7px); }
+.legend .sw.blk { height: .6rem; width: .6rem; border-radius: 2px; }
+.legend .sw.ref { background: repeating-linear-gradient(90deg, var(--cds-chart-reference) 0 4px, transparent 4px 7px); }
+.tt { position: absolute; pointer-events: none; background: var(--cds-surface-popover); border: 1px solid var(--cds-border); border-radius: var(--cds-radius); box-shadow: var(--cds-shadow-popover); padding: var(--cds-pad-xs) var(--cds-pad-sm); font-size: var(--cds-font-size-caption); white-space: nowrap; z-index: 2; opacity: 0; transition: opacity .1s; font-variant-numeric: tabular-nums; }
+.tt .tt-h { color: var(--cds-text-secondary); margin-bottom: 2px; }
+.tt i { display: inline-block; width: .5rem; height: .5rem; border-radius: 50%; margin-right: .35rem; }
+.failed { display: flex; align-items: center; justify-content: center; gap: .4rem; min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
+.failed::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
+.tbl-wrap { overflow-x: auto; }
+table.tb { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
+table.tb th, table.tb td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
+table.tb th { font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); white-space: normal; vertical-align: bottom; }
+table.tb th:first-child, table.tb td:first-child { text-align: left; white-space: normal; min-width: 12rem; }
+table.tb td.nsw, table.tb th.nsw { background: color-mix(in srgb, var(--color-fg) 6%, transparent); font-weight: var(--cds-font-weight-medium); }
+table.tb tbody tr:last-child td { border-bottom: 0; }
+table.tb.left td, table.tb.left th { text-align: left; white-space: normal; }
+table.tb.left td:first-child { min-width: 6.5rem; white-space: nowrap; }
+.hbars { display: grid; gap: 6px; font-size: var(--cds-font-size-caption); min-height: 160px; }
+.hbar { display: grid; grid-template-columns: minmax(8rem, 40%) 1fr auto; align-items: center; gap: 8px; }
+.hbar .t { height: 10px; border-radius: 5px; background: var(--color-border-line); overflow: hidden; }
+.hbar .f { height: 100%; border-radius: 5px; }
+.hbar .n { font-variant-numeric: tabular-nums; min-width: 4.5rem; text-align: right; }
+.facts { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 10rem), 1fr)); gap: var(--cds-gap-md); }
+.fact .fv { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); line-height: 1.1; font-variant-numeric: tabular-nums; }
+.fact .fl { font-size: var(--cds-font-size-caption); color: var(--color-fg-muted); }
+.notes { font-size: var(--cds-font-size-body); line-height: 1.55; max-width: 80ch; }
+.notes li { margin-bottom: var(--cds-gap-sm); }
+.notes a { color: inherit; }
+.p2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 32rem), 1fr)); gap: var(--cds-gap-md); align-items: start; }
+.p2-col { display: grid; gap: var(--cds-gap-md); min-width: 0; }
+.donut-wrap { display: grid; grid-template-columns: minmax(0, 190px) minmax(0, 1fr); gap: var(--cds-gap-md); align-items: center; }
+@media (max-width: 640px) { .donut-wrap { grid-template-columns: minmax(0, 1fr); justify-items: center; } .donut-wrap .chart.donut { width: 190px; } }
+.chart.donut { min-height: 180px; }
+table.tb.dl td:first-child, table.tb.dl th:first-child { min-width: 0; white-space: normal; }
+table.tb.dl td:first-child i { display: inline-block; width: .6rem; height: .6rem; border-radius: 2px; margin-right: .4rem; vertical-align: middle; }
+table.tb.wrap td, table.tb.wrap th { white-space: normal; }
+table.tb.wrap td:nth-child(2), table.tb.wrap th:nth-child(2) { text-align: left; min-width: 10rem; }
+.callout { margin-top: var(--cds-gap-md); padding: var(--cds-pad-md); border-radius: var(--cds-radius); background: color-mix(in srgb, var(--color-fg) 8%, transparent); border-left: 4px solid var(--color-fg); font-size: var(--cds-font-size-body); line-height: 1.5; }
+.banner { background: var(--color-ok); color: var(--color-bg); border-radius: var(--cds-radius); padding: var(--cds-pad-md) var(--cds-pad-lg); font-size: var(--cds-font-size-body); }
+.banner .bn-v { font-family: var(--font-anthropic-serif); font-size: var(--cds-font-size-title); margin-right: .4rem; }
+.band { margin-top: var(--cds-gap-lg); background: var(--color-fg); color: var(--color-bg); border-radius: var(--cds-radius); padding: var(--cds-pad-lg); font-size: var(--cds-font-size-caption); text-align: center; line-height: 1.6; }
+.band p { margin: 0 0 var(--cds-gap-xs); }
+.band .bl { font-weight: var(--cds-font-weight-medium); text-transform: uppercase; letter-spacing: .03em; opacity: .8; }
+.band .bnote { opacity: .75; margin: var(--cds-gap-sm) 0 0; }
+.blist span + span::before { content: " | "; opacity: .6; }
+.news-cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 24rem), 1fr)); gap: var(--cds-gap-md); align-items: start; }
+.news-list { list-style: none; margin: 0; padding: 0; min-height: 120px; }
+.news-list li { display: grid; grid-template-columns: 4.2rem 1fr; gap: var(--cds-gap-sm); padding: var(--cds-pad-sm) 0; border-bottom: 1px solid var(--color-border-line); font-size: var(--cds-font-size-caption); }
+.news-list li:last-child { border-bottom: 0; }
+.news-list .nd { color: var(--color-fg-muted); font-variant-numeric: tabular-nums; }
+.news-list a { color: var(--color-fg); text-decoration: none; font-size: var(--cds-font-size-body); line-height: 1.35; }
+.news-list a:hover { text-decoration: underline; }
+.news-list .ns { display: block; color: var(--color-fg-muted); margin-top: 2px; }
+[data-dash-source-state=refreshing] { opacity: .5; transition: opacity var(--cds-dur-slow); }
+[data-dash-source-state=empty] { color: transparent; }
+
+</style>
+</head>
+<body>
+<div id="dash-root">
+
+
+<div class="td">
+  <header class="td-head">
+    <div>
+      <h1 class="td-title" id="top">NSW Economy and Budget Dashboard</h1>
+      <p class="td-sub" id="takeaway">NSW unemployment is <b data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=unemp">—</b> (<span data-draw="fx" data-source="c_fast" data-field="period" data-where="id=unemp">—</span>), Sydney inflation is <b data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=cpi">—</b> and the cash rate is <b data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=cash">—</b>. The <span data-draw="fx" data-source="c_fast" data-field="period" data-where="id=budget">—</span> result is <b data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=budget">—</b>, with net debt of <b data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=net_debt">—</b> by <span data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=net_debt">—</span>.</p>
+      <p class="td-asof">Figures checked against their sources <span data-draw="asof">—</span>. Updated daily.</p>
+    </div>
+    <nav class="td-tabs" role="tablist" aria-label="Dashboard pages">
+      <button class="td-tab" role="tab" id="tab-economy" data-tab="economy" aria-selected="true">Economy</button>
+      <button class="td-tab" role="tab" id="tab-budget" data-tab="budget" aria-selected="false">Budget</button>
+      <button class="td-tab" role="tab" id="tab-news" data-tab="news" aria-selected="false">News and releases</button>
+      <button class="td-tab" role="tab" id="tab-notes" data-tab="notes" aria-selected="false">Sources and notes</button>
+    </nav>
+  </header>
+
+  <section class="td-page" id="economy">
+    <h2 class="td-h2" id="fast-figures">Fast figures</h2>
+    <div class="td-key"><span class="k-good">Positive change</span><span class="k-bad">Negative change</span><span>Neutral</span><span>TTY = through the year</span></div>
+
+    <h3 class="td-group">Fiscal</h3>
+    <div class="tiles">
+      <article class="tile" id="t-budget" data-id="budget"><h3 class="tile-l">Budget surplus/deficit</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=budget">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=budget">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=budget">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=budget">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=budget">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=budget">—</span></div></div></article>
+      <article class="tile" id="t-avg_result" data-id="avg_result"><h3 class="tile-l">Forecast average result</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=avg_result">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=avg_result">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=avg_result">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=avg_result">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=avg_result">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=avg_result">—</span></div></div></article>
+      <article class="tile" id="t-expense" data-id="expense"><h3 class="tile-l">Expense growth rate</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=expense">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=expense">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=expense">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=expense">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=expense">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=expense">—</span></div></div></article>
+      <article class="tile" id="t-net_debt" data-id="net_debt"><h3 class="tile-l">Net debt</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=net_debt">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=net_debt">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=net_debt">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=net_debt">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=net_debt">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=net_debt">—</span></div></div></article>
+      <article class="tile" id="t-interest" data-id="interest"><h3 class="tile-l">Interest expense</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=interest">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=interest">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=interest">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=interest">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=interest">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=interest">—</span></div></div></article>
+      <article class="tile" id="t-super" data-id="super"><h3 class="tile-l">Superannuation provision</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=super">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=super">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=super">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=super">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=super">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=super">—</span></div></div></article>
+      <article class="tile" id="t-credit" data-id="credit"><h3 class="tile-l">Credit rating</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=credit">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=credit">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=credit">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=credit">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=credit">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=credit">—</span></div></div></article>
+    </div>
+
+    <h3 class="td-group">Economy, jobs and population</h3>
+    <div class="tiles">
+      <article class="tile" id="t-gsp" data-id="gsp"><h3 class="tile-l">Gross state product</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=gsp">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=gsp">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=gsp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=gsp">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=gsp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=gsp">—</span></div></div></article>
+      <article class="tile" id="t-sfd" data-id="sfd"><h3 class="tile-l">State final demand</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=sfd">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=sfd">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=sfd">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=sfd">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=sfd">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=sfd">—</span></div></div></article>
+      <article class="tile" id="t-unemp" data-id="unemp"><h3 class="tile-l">Unemployment rate</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=unemp">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=unemp">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=unemp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=unemp">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=unemp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=unemp">—</span></div></div></article>
+      <article class="tile" id="t-aus_unemp" data-id="aus_unemp"><h3 class="tile-l">Australian unemployment rate</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=aus_unemp">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=aus_unemp">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=aus_unemp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=aus_unemp">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=aus_unemp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=aus_unemp">—</span></div></div></article>
+      <article class="tile" id="t-emp" data-id="emp"><h3 class="tile-l">Employment growth</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=emp">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=emp">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=emp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=emp">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=emp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=emp">—</span></div></div></article>
+      <article class="tile" id="t-part" data-id="part"><h3 class="tile-l">Participation rate</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=part">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=part">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=part">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=part">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=part">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=part">—</span></div></div></article>
+      <article class="tile" id="t-pop" data-id="pop"><h3 class="tile-l">Population growth</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=pop">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=pop">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=pop">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=pop">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=pop">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=pop">—</span></div></div></article>
+      <article class="tile" id="t-interstate" data-id="interstate"><h3 class="tile-l">People lost to other states</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=interstate">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=interstate">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=interstate">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=interstate">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=interstate">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=interstate">—</span></div></div></article>
+    </div>
+
+    <h3 class="td-group">Wages, prices and rates</h3>
+    <div class="tiles">
+      <article class="tile" id="t-cpi" data-id="cpi"><h3 class="tile-l">Consumer price index</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=cpi">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=cpi">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=cpi">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=cpi">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=cpi">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=cpi">—</span></div></div></article>
+      <article class="tile" id="t-wpi" data-id="wpi"><h3 class="tile-l">Wage price index</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=wpi">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=wpi">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=wpi">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=wpi">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=wpi">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=wpi">—</span></div></div></article>
+      <article class="tile" id="t-real_wage" data-id="real_wage"><h3 class="tile-l">Real wage growth</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=real_wage">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=real_wage">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=real_wage">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=real_wage">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=real_wage">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=real_wage">—</span></div></div></article>
+      <article class="tile" id="t-spend" data-id="spend"><h3 class="tile-l">Household spending</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=spend">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=spend">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=spend">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=spend">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=spend">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=spend">—</span></div></div></article>
+      <article class="tile" id="t-cash" data-id="cash"><h3 class="tile-l">Cash rate</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=cash">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=cash">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=cash">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=cash">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=cash">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=cash">—</span></div></div></article>
+      <article class="tile" id="t-nab" data-id="nab"><h3 class="tile-l">Business conditions</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=nab">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=nab">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=nab">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=nab">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=nab">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=nab">—</span></div></div></article>
+    </div>
+
+    <h3 class="td-group">Housing and business</h3>
+    <div class="tiles">
+      <article class="tile" id="t-approvals" data-id="approvals"><h3 class="tile-l">Dwelling approvals</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=approvals">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=approvals">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=approvals">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=approvals">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=approvals">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=approvals">—</span></div></div></article>
+      <article class="tile" id="t-commence" data-id="commence"><h3 class="tile-l">Dwelling commencements</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=commence">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=commence">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=commence">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=commence">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=commence">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=commence">—</span></div></div></article>
+      <article class="tile" id="t-completions" data-id="completions"><h3 class="tile-l">Dwelling completions</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=completions">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=completions">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=completions">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=completions">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=completions">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=completions">—</span></div></div></article>
+      <article class="tile" id="t-property" data-id="property"><h3 class="tile-l">Sydney median dwelling value</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=property">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=property">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=property">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=property">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=property">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=property">—</span></div></div></article>
+      <article class="tile" id="t-insolv" data-id="insolv"><h3 class="tile-l">Company insolvencies</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=insolv">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=insolv">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=insolv">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=insolv">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=insolv">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=insolv">—</span></div></div></article>
+    </div>
+
+    <h3 class="td-group">National and markets</h3>
+    <div class="tiles">
+      <article class="tile" id="t-gdp" data-id="gdp"><h3 class="tile-l">Australian GDP growth</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=gdp">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=gdp">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=gdp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=gdp">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=gdp">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=gdp">—</span></div></div></article>
+      <article class="tile" id="t-bond" data-id="bond"><h3 class="tile-l">10-year government bond yield</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=bond">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=bond">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=bond">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=bond">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=bond">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=bond">—</span></div></div></article>
+      <article class="tile" id="t-fx" data-id="fx"><h3 class="tile-l">Australian dollar</h3><p class="tile-v" data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=fx">—</p><p class="tile-p" data-draw="fx" data-source="c_fast" data-field="period" data-where="id=fx">—</p><div class="tile-c"><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=fx">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=fx">—</span></div><div><span class="cl" data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=fx">—</span><span class="cv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=fx">—</span></div></div></article>
+    </div>
+
+    <h2 class="td-h2" id="economic-dashboard">Economic charts</h2>
+    <p class="td-lede">ABS, RBA and ASIC series. The dashed vertical line marks the March 2023 state election. Hover any chart for values.</p>
+    <div class="grid">
+      <div class="card" id="card-sfd"><h3>NSW state final demand growth</h3><p class="note">Real, per cent change through the year</p><div class="chart dash-skeleton" id="ch-sfd" data-draw="ch-sfd" data-source="c_sfd_growth refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>Seasonally adjusted</span><span><i class="sw dash" data-c="1"></i>Trend</span></div></div>
+      <div class="card" id="card-wages"><h3>Wages against prices</h3><p class="note">Wage price index, per cent change through the year; real wages are NSW wage growth less Sydney CPI growth</p><div class="chart dash-skeleton" id="ch-wages" data-draw="ch-wages" data-source="c_wages refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>NSW, all sectors</span><span><i class="sw" data-c="2"></i>NSW private</span><span><i class="sw" data-c="3"></i>NSW public</span><span><i class="sw dash" data-c="1"></i>Australia</span><span><i class="sw" data-c="4"></i>NSW real wages</span></div></div>
+      <div class="card" id="card-cpi"><h3>Consumer price index growth</h3><p class="note">All groups, per cent change through the year, quarterly</p><div class="chart dash-skeleton" id="ch-cpi" data-draw="ch-cpi" data-source="c_cpi_tty refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>Sydney</span><span><i class="sw dash" data-c="1"></i>Eight capitals</span></div></div>
+      <div class="card" id="card-housing"><h3>NSW housing pipeline against the Housing Accord</h3><p class="note">Dwellings, rolling 12-month totals: approvals by type, then commencements and completions (quarterly)</p><div class="chart tall dash-skeleton" id="ch-housing" data-draw="ch-housing" data-source="c_housing refs"></div><div class="legend"><span><i class="sw blk" data-c="0"></i>Approved houses</span><span><i class="sw blk" data-c="1"></i>Approved units and other</span><span><i class="sw" data-c="2"></i>Commencements</span><span><i class="sw" data-c="3"></i>Completions</span><span><i class="sw ref"></i>Accord pace</span></div></div>
+      <div class="card" id="card-unemp"><h3>Unemployment rate, NSW and Australia</h3><p class="note">Per cent of labour force</p><div class="chart dash-skeleton" id="ch-unemp" data-draw="ch-unemp" data-source="abs_labour_nsw refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>NSW, seasonally adjusted</span><span><i class="sw dash" data-c="0"></i>NSW, trend</span><span><i class="sw" data-c="1"></i>Australia, seasonally adjusted</span></div></div>
+      <div class="card" id="card-emp"><h3>NSW employment growth</h3><p class="note">Per cent change through the year</p><div class="chart dash-skeleton" id="ch-emp" data-draw="ch-emp" data-source="c_emp_growth refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>Seasonally adjusted</span><span><i class="sw dash" data-c="1"></i>Trend</span></div></div>
+      <div class="card" id="card-part"><h3>NSW participation rate</h3><p class="note">Per cent of civilian population aged 15+</p><div class="chart dash-skeleton" id="ch-part" data-draw="ch-part" data-source="abs_labour_nsw refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>Seasonally adjusted</span><span><i class="sw dash" data-c="1"></i>Trend</span></div></div>
+      <div class="card" id="card-spend"><h3>Household spending growth</h3><p class="note">Nominal, per cent change through the year, seasonally adjusted (replaces retail trade)</p><div class="chart dash-skeleton" id="ch-spend" data-draw="ch-spend" data-source="abs_spending refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>NSW</span><span><i class="sw dash" data-c="1"></i>Australia</span></div></div>
+      <div class="card" id="card-cash"><h3>RBA cash rate target</h3><p class="note">Per cent, at each decision</p><div class="chart dash-skeleton" id="ch-cash" data-draw="ch-cash" data-source="rba_cash_rate refs"></div></div>
+      <div class="card" id="card-pop"><h3>Population growth, NSW and Australia</h3><p class="note">Estimated resident population, per cent change through the year</p><div class="chart dash-skeleton" id="ch-pop" data-draw="ch-pop" data-source="c_pop_growth refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>NSW</span><span><i class="sw dash" data-c="1"></i>Australia</span></div></div>
+      <div class="card" id="card-interstate"><h3>People lost to other states</h3><p class="note">NSW net interstate migration, persons per quarter</p><div class="chart dash-skeleton" id="ch-interstate" data-draw="ch-interstate" data-source="abs_interstate"></div></div>
+      <div class="card" id="card-insolv"><h3>NSW companies entering external administration</h3><p class="note">ASIC Series 1, per month. August 2026 includes one group's mass appointment (see notes)</p><div class="chart dash-skeleton" id="ch-insolv" data-draw="ch-insolv" data-source="asic_insolvency"></div></div>
+    </div>
+
+    <h2 class="td-h2" id="state-comparison">State vs state comparison</h2>
+    <p class="td-lede">Latest period for each indicator. Rank is NSW's position among the six states: 1 is the highest value, except unemployment, where 1 is the lowest.</p>
+    <div class="card"><div class="tbl-wrap">
+      <table class="tb" id="tb-states" data-source="c_state_compare" data-row-key="indicator">
+        <thead><tr><th data-field="indicator">Indicator</th><th data-field="period">Period</th><th class="nsw" data-field="NSW">NSW</th><th data-field="VIC">VIC</th><th data-field="QLD">QLD</th><th data-field="SA">SA</th><th data-field="WA">WA</th><th data-field="TAS">TAS</th><th data-field="AUS">AUS</th><th data-field="nsw_rank">NSW rank</th></tr></thead>
+        <tbody data-draw="tb-states"></tbody>
+      </table>
+    </div></div>
+
+    <h2 class="td-h2" id="outlook">Economic performance and outlook</h2>
+    <p class="td-lede">NSW Treasury forecasts, 2026-27 Budget (Budget Paper No. 1, Table 2.1). Annual average per cent change unless otherwise indicated.</p>
+    <div class="card"><div class="tbl-wrap">
+      <table class="tb" id="tb-outlook" data-source="outlook" data-row-key="indicator"><thead data-draw="th-outlook"></thead><tbody data-draw="tb-outlook"></tbody></table>
+    </div></div>
+
+    <div class="grid" style="margin-top: var(--cds-gap-xl)">
+      <div class="card" id="card-property">
+        <h3>Property in Sydney</h3><p class="note">Cotality Home Value Index, median value</p>
+        <div class="facts">
+          <div class="fact"><div class="fl">Houses</div><div class="fv" data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=property">—</div><div class="fl"><span data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=property_h">—</span> <span data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=property_h">—</span></div><div class="fl"><span data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=property_h">—</span> <span data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=property_h">—</span></div></div>
+          <div class="fact"><div class="fl">Units</div><div class="fv" data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=property">—</div><div class="fl"><span data-draw="fx" data-source="c_fast" data-field="a_label" data-where="id=property_u">—</span> <span data-draw="fx" data-source="c_fast" data-field="a_text" data-where="id=property_u">—</span></div><div class="fl"><span data-draw="fx" data-source="c_fast" data-field="b_label" data-where="id=property_u">—</span> <span data-draw="fx" data-source="c_fast" data-field="b_text" data-where="id=property_u">—</span></div></div>
+        </div>
+        <p class="note" style="margin-top: var(--cds-gap-sm)">As at <span data-draw="fx" data-source="c_fast" data-field="period" data-where="id=property">—</span></p>
+      </div>
+      <div class="card" id="card-productivity">
+        <h3>Labour productivity</h3><p class="note">NSW, average annual growth (Budget Paper No. 1)</p>
+        <div class="facts">
+          <div class="fact"><div class="fv"><span data-draw="fx" data-source="budget_facts" data-field="value" data-where="key=prod_1990s">—</span>%</div><div class="fl">1990s average</div></div>
+          <div class="fact"><div class="fv"><span data-draw="fx" data-source="budget_facts" data-field="value" data-where="key=prod_20yr">—</span>%</div><div class="fl">Past 20 years</div></div>
+          <div class="fact"><div class="fv"><span data-draw="fx" data-source="budget_facts" data-field="value" data-where="key=prod_forecast">—</span>%</div><div class="fl">Treasury baseline, 2025-26 to 2029-30</div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="td-page" id="budget" hidden>
+    <div class="p2">
+      <div class="p2-col">
+        <div class="card" id="card-budget"><h3>Budget summary, 2026-27 Budget</h3><p class="note">General government sector operating aggregates, $ billion. 2024-25 actual, 2025-26 revised, then budget and forward estimates</p><div class="chart tall dash-skeleton" id="ch-budget" data-draw="ch-budget" data-source="budget_aggregates"></div><div class="legend"><span><i class="sw blk" data-c="0"></i>Revenue</span><span><i class="sw blk" data-c="1"></i>Expense</span><span><i class="sw blk" data-c="2"></i>Budget result</span></div></div>
+        <div class="card" id="card-revenue"><h3>Revenue, 2026-27 Budget</h3><p class="note">Share of total general government revenue</p>
+          <div class="donut-wrap"><div class="chart donut dash-skeleton" id="ch-rev-donut" data-draw="ch-rev-donut" data-source="c_rev_share"></div>
+          <table class="tb dl" id="tb-revenue" data-source="c_rev_share" data-row-key="component"><thead><tr><th data-field="component">Source</th><th data-field="amount_m">$m</th><th data-field="share_pct">%</th></tr></thead><tbody data-draw="tb-revenue"></tbody></table></div></div>
+        <div class="card" id="card-expenses"><h3>Expenses, 2026-27 Budget</h3><p class="note">Share of total general government expenses</p>
+          <div class="donut-wrap"><div class="chart donut dash-skeleton" id="ch-exp-donut" data-draw="ch-exp-donut" data-source="c_exp_share"></div>
+          <table class="tb dl" id="tb-expenses" data-source="c_exp_share" data-row-key="component"><thead><tr><th data-field="component">Type</th><th data-field="amount_m">$m</th><th data-field="share_pct">%</th></tr></thead><tbody data-draw="tb-expenses"></tbody></table></div></div>
+      </div>
+      <div class="p2-col">
+        <div class="card" id="card-taxation"><h3>Taxation, 2026-27 Budget</h3><p class="note">Budget Paper No. 1, Table 4.4, grouped as in the 2019 dashboard</p>
+          <div class="tbl-wrap"><table class="tb" id="tb-tax-summary" data-source="c_tax_summary" data-row-key="tax"><thead><tr><th data-field="tax">Tax</th><th data-field="share_of_tax_text">Per cent of taxation 2026-27</th><th data-field="share_of_revenue_pct">Per cent of total revenue 2026-27</th></tr></thead><tbody data-draw="tb-tax-summary"></tbody></table></div>
+          <div class="callout" id="td-callout">In 2026-27, transfer duty is forecast to be <b data-draw="fx" data-source="c_td_callout" data-field="amount_text" data-where="id=td">—</b>, <span data-draw="fx" data-source="c_td_callout" data-field="dir_text" data-where="id=td">—</span> <b data-draw="fx" data-source="c_td_callout" data-field="change_text" data-where="id=td">—</b> on 2025-26. It has been revised down by <b>$<span data-draw="fx" data-source="budget_facts" data-field="value" data-where="key=td_revision_4yr">—</span> billion</b> over the four years to 2029-30 since the Half-Yearly Review. First home buyer duty assistance is worth <b>$<span data-draw="fx" data-source="budget_facts" data-field="value" data-where="key=fhb_2026_27">—</span>m</b> in 2026-27.</div>
+          <p class="note" style="margin-top: var(--cds-gap-sm)">The 2019 dashboard's residential share of transfer duty is not published in the 2026-27 Budget papers.</p>
+        </div>
+      </div>
+      <div class="p2-col">
+        <div class="banner" id="infra-banner"><span class="bn-v">$<span data-draw="fx" data-source="budget_facts" data-field="value" data-where="key=infra_total">—</span> billion</span> Infrastructure program over four years</div>
+        <div class="card" id="card-top10"><h3>Top 10 capital programs by value</h3><p class="note">Ranked by estimated total cost, or where that is not published, by expenditure to June 2026 plus the four-year program</p>
+          <div class="tbl-wrap"><table class="tb wrap" id="tb-top10" data-source="capital_programs" data-row-key="project"><thead><tr><th data-field="project">Project</th><th data-field="released_info">Publicly released information</th><th data-field="completion">Project completion date</th></tr></thead><tbody data-draw="tb-top10"></tbody></table></div></div>
+        <div class="card" id="card-other-projects"><h3>Other major capital projects</h3>
+          <div class="tbl-wrap"><table class="tb wrap" id="tb-other-projects" data-source="capital_programs" data-row-key="project"><thead><tr><th data-field="project">Project</th><th data-field="released_info">Publicly released information</th><th data-field="completion">Project completion date</th></tr></thead><tbody data-draw="tb-other-projects"></tbody></table></div></div>
+      </div>
+    </div>
+
+    <div class="band" id="exports-band">
+      <p><span class="bl">Main exports (<span data-draw="fx" data-source="c_exports_fy" data-field="period" data-where="id=band">—</span>):</span> <span class="blist" data-draw="bl-main" data-source="exports_fy"></span></p>
+      <p><span class="bl">NSW top 5 merchandise export trading partners (<span data-draw="fx" data-source="c_exports_fy" data-field="period" data-where="id=band">—</span>):</span> <span class="blist" data-draw="bl-partners" data-source="exports_fy"></span></p>
+      <p><span class="bl">Total value of NSW exports (nominal):</span> <b data-draw="fx" data-source="c_exports_fy" data-field="total_text" data-where="id=band">—</b> (<span data-draw="fx" data-source="c_exports_fy" data-field="share_text" data-where="id=band">—</span> of GSP in <span data-draw="fx" data-source="c_exports_fy" data-field="period" data-where="id=band">—</span>) &nbsp;|&nbsp; <span class="bl"><span data-draw="fx" data-source="c_exports_fy" data-field="period" data-where="id=band">—</span> NSW GSP (nominal):</span> <b data-draw="fx" data-source="c_exports_fy" data-field="gsp_text" data-where="id=band">—</b></p>
+      <p class="bnote">Goods <span data-draw="fx" data-source="c_exports_fy" data-field="goods_text" data-where="id=band">—</span> plus services <span data-draw="fx" data-source="c_exports_fy" data-field="services_text" data-where="id=band">—</span>. Latest 12 months of goods exports: <span data-draw="fx" data-source="c_fast" data-field="value_text" data-where="id=exports">—</span> (<span data-draw="fx" data-source="c_fast" data-field="period" data-where="id=exports">—</span>).</p>
+    </div>
+
+    <h2 class="td-h2" id="more-detail">More detail</h2>
+    <div class="grid">
+      <div class="card" id="card-debt"><h3>Gross and net debt at 30 June</h3><p class="note">$ billion</p><div class="chart tall dash-skeleton" id="ch-debt" data-draw="ch-debt" data-source="budget_aggregates"></div><div class="legend"><span><i class="sw blk" data-c="0"></i>Gross debt</span><span><i class="sw blk" data-c="1"></i>Net debt</span></div></div>
+      <div class="card" id="card-hist-result"><h3>Budget result since 2000-01</h3><p class="note">$ billion. Budget Paper No. 1, Table E.6; projections from 2026-27</p><div class="chart dash-skeleton" id="ch-hist-result" data-draw="ch-hist-result" data-source="budget_history"></div></div>
+      <div class="card" id="card-hist-debt"><h3>Net debt and interest expense since 2000-01</h3><p class="note">$ billion. Budget Paper No. 1, Table E.7</p><div class="chart dash-skeleton" id="ch-hist-debt" data-draw="ch-hist-debt" data-source="budget_history"></div><div class="legend"><span><i class="sw" data-c="0"></i>Net debt</span><span><i class="sw dash" data-c="1"></i>Interest expense</span></div></div>
+      <div class="card" id="card-infra"><h3>Capital program by agency group</h3><p class="note">$ billion over four years to 2029-30 (Budget Paper No. 3, Table 1.3). General government program: $<span data-draw="fx" data-source="budget_facts" data-field="value" data-where="key=infra_gg">—</span> billion</p><div class="hbars dash-skeleton" data-draw="hb-agency" data-source="capital_by_agency"></div></div>
+      <div class="card" id="card-tax-detail"><h3>Taxation by tax, detail</h3><p class="note">Budget Paper No. 1, Table 4.4</p><div class="tbl-wrap"><table class="tb" id="tb-tax" data-source="taxation" data-row-key="tax"><thead data-draw="th-tax"></thead><tbody data-draw="tb-tax"></tbody></table></div></div>
+      <div class="card" id="card-credit"><h3>Credit ratings</h3><p class="note">State of New South Wales</p><div class="tbl-wrap"><table class="tb" id="tb-credit" data-source="budget_facts" data-row-key="key"><thead><tr><th data-field="label">Agency</th><th data-field="value">Rating</th><th data-field="note">Latest action</th></tr></thead><tbody data-draw="tb-credit"></tbody></table></div></div>
+    </div>
+  </section>
+
+  <section class="td-page" id="news" hidden>
+    <h2 class="td-h2" id="releases">Upcoming data releases</h2>
+    <p class="td-lede">Release dates for the figures on this dashboard, from the ABS release calendar and the RBA, NAB and Cotality schedules. Times are Sydney time.</p>
+    <div class="card"><div class="tbl-wrap">
+      <table class="tb left" id="tb-releases" data-source="releases" data-row-key="date,release"><thead><tr><th data-field="date">Date</th><th data-field="time">Time</th><th data-field="release">Release</th><th data-field="reference_period">Reference period</th><th data-field="measure">Dashboard measure</th><th data-field="publisher">Publisher</th></tr></thead><tbody data-draw="tb-releases"></tbody></table>
+    </div></div>
+
+    <h2 class="td-h2" id="headlines">In the news</h2>
+    <p class="td-lede">NSW economy and budget headlines collected from Google News each week. Links open the original story.</p>
+    <div class="news-cols">
+      <div class="card" id="card-news-this"><h3>This week</h3><ul class="news-list" data-draw="news-this" data-source="news"></ul></div>
+      <div class="card" id="card-news-last"><h3>Last week</h3><ul class="news-list" data-draw="news-last" data-source="news"></ul></div>
+      <div class="card" id="card-themes"><h3>Headline themes</h3><p class="note">Number of matching headlines over the past two weeks</p><div class="hbars dash-skeleton" data-draw="hb-themes" data-source="news_themes"></div></div>
+    </div>
+  </section>
+
+  <section class="td-page notes" id="notes" hidden>
+    <h2 class="td-h2">How this stays current</h2>
+    <ul>
+      <li>A scheduled refresh runs every day at 11:52am Sydney time, after the ABS's 11:30am release slot. It re-reads every ABS series from the ABS Data API, the RBA cash rate and exchange rates, the NAB Monthly Business Survey, the Cotality Home Value Index, the ABS state accounts, the weekly headline feed and the release calendar, and updates only the sources with new figures. Each source and its last update are listed below.</li>
+      <li>ASIC insolvency statistics are published only as spreadsheets, so they are read by a separate weekday check.</li>
+      <li>Budget figures are fixed to the 2026-27 NSW Budget (23 June 2026) until the next fiscal release: the 2025-26 Report on State Finances, the 2026-27 Half-Yearly Review and the Pre-Election Budget Update. The daily refresh checks for these and flags them; the budget pages are rebuilt when they land.</li>
+    </ul>
+    <h2 class="td-h2">Data quality flags</h2>
+    <ul>
+      <li><b>Cash rate.</b> The RBA lifted the cash rate target by 25 basis points to 4.85 per cent, effective 4 November 2026. </li>
+      <li><b>Unemployment by state.</b> Figures are the persons series for each state, read directly from the ABS.</li>
+      <li><b>Wage price index.</b> The ABS moved its Wage Price Index dataflow to version 1.2.0. The refresh now asks for the latest version of every ABS dataflow, so a version change does not stop an update.</li>
+      <li><b>Insolvencies, August 2026.</b> ASIC counts each registered company separately. The August spike in NSW reflects one corporate group (Universal Property Group, the entities behind Bathla Group) entering voluntary administration on 25 August 2026, with the same administrator over several hundred companies. Rolling totals will carry this for twelve months.</li>
+      <li><b>Housing Accord.</b> The pace line is 377,000 homes over five years from 1 July 2024, or 75,400 a year. It is compared with ABS dwelling completions (total residential, original), the closest published measure of new homes delivered.</li>
+      <li><b>Real wages.</b> Real wage growth is calculated here as NSW wage price index growth less Sydney CPI growth for the same quarter. It is not an ABS series.</li>
+      <li><b>Gross state product.</b> The tile and the state table use the ABS State Accounts. The 2025-26 State Accounts are due on 19 November 2026 and will replace the 2024-25 figures automatically.</li>
+      <li><b>Bond yields.</b> The 10-year yield is the RBA's monthly average (table F2.1), read through the open-source NSW Economic Dashboard pipeline on GitHub, because the RBA's data files cannot be read directly by the refresh. It updates once a month.</li>
+      <li><b>Australian dollar.</b> The rate is the RBA's 4pm rate against the US dollar. The RBA page shows only the past week, so the history held here begins on 4 November 2026 and builds day by day.</li>
+      <li><b>Headlines.</b> Headlines come from Google News through the same open-source pipeline, which updates them each Monday. Google News cannot be read directly by the refresh.</li>
+      <li><b>Release calendar.</b> The ABS calendar lists the September 2026 Building Approvals for 9 November in error; that release came out on 2 November and is already included.</li>
+      <li><b>Exports.</b> Non-monetary gold is the largest NSW goods export over the past year and drives the Hong Kong and United Kingdom destinations. Totals are goods only and exclude services such as education and tourism, so they are not comparable with the 2019 dashboard's total exports figure.</li>
+      <li><b>Retail trade.</b> The ABS Retail Trade series has been replaced by the Monthly Household Spending Indicator, which is used here (nominal, seasonally adjusted).</li>
+      <li><b>CPI.</b> The ABS now publishes a complete monthly CPI. The headline tile uses the monthly through-the-year rate for Sydney; the chart uses the quarterly index.</li>
+      <li><b>Business investment.</b> ABS reports NSW private business investment up sharply in the March quarter 2026 and unchanged in the June quarter, which lifts NSW's annual average growth and ranks it first. Treat the June quarter figure with care until the ABS revises it.</li>
+      <li><b>State final demand.</b> ABS trend estimates were suspended through the COVID period, so the trend line has a gap. Australia-level state final demand and business investment are not published in the state series and show as n.a.</li>
+      <li><b>Interstate migration.</b> Net interstate migration is in persons; arrivals and departures are published in thousands.</li>
+      <li><b>Superannuation.</b> The figure is the general government superannuation provision net of prepaid contributions, per the budget balance sheet. It is not comparable with the gross liability shown in the 2019 dashboard.</li>
+      <li><b>Business conditions.</b> The NAB tile is the national seasonally adjusted net balance; NAB does not publish a headline NSW figure in its release.</li>
+      <li><b>Bread and milk prices</b> from the 2019 dashboard are not reproduced: the ABS no longer publishes average retail prices of selected items. <b>Regional jobs growth</b> is replaced by Rest of NSW dwelling approvals and the participation rate, because the regional labour force estimates are not available through the ABS Data API.</li>
+      <li><b>Top 10 capital programs.</b> Several of the largest projects (Sydney Metro West, Sydney Metro Western Sydney Airport, M6 Stage 1) have no published estimated total cost. They are ranked by expenditure to 30 June 2026 plus the four-year program, which understates their total cost; the published figures are shown as released.</li>
+      <li><b>Total exports.</b> The Budget page band adds ABS merchandise exports (state of origin, 2024-25) to ABS services exports by state (balance of payments basis, 2024-25). The two bases differ slightly, so the total is indicative.</li>
+      <li><b>Residential transfer duty.</b> The 2019 dashboard's callout used Treasury's residential share of transfer duty, which the 2026-27 Budget papers do not publish; the callout instead shows the published change and revision.</li>
+      <li><b>Credit ratings.</b> S&amp;P lifted its outlook from negative to stable on 11 September 2026, after the Budget was published.</li>
+    </ul>
+    <h2 class="td-h2">Sources</h2>
+    <ul>
+      <li>NSW Budget 2026-27, Budget Paper No. 1 Budget Statement: Tables 1.2, 2.1, 4.1, 4.4, 4.5, 5.3, 6.1, A.1, A.2, E.1, E.6, E.7. <a href="https://www.parliament.nsw.gov.au/tp/files/211331/2026-27%20Budget%20Paper%20No.01%20-%20Budget%20Statement.pdf">Tabled paper (PDF)</a>; <a href="https://www.nsw.gov.au/business-and-economy/nsw-budget/2026-27-budget-papers/open-data">Budget open data (budgeted financial statements)</a></li>
+      <li>NSW Budget 2026-27, Budget Paper No. 3 Infrastructure Statement: Table 1.3, Chapter 2 project tables, Box 2.18 and Chapter 4 agency tables (Sydney Metro p. 4-56, Transport for NSW p. 4-50, Energy Corporation of NSW p. 4-9, Ministry of Health p. 4-36). <a href="https://www.nsw.gov.au/business-and-economy/nsw-budget/2026-27-budget-papers/budget-paper-no03-infrastructure-statement">BP3</a></li>
+      <li>ABS Data API (dataflows LF, ANA_SFD, ANA_AGG, CPI, WPI, ERP_Q, ERP_COMP_Q, BA_GCCSA, BUILDING_ACTIVITY, HSI_M, MERCH_EXP). <a href="https://data.api.abs.gov.au/">data.api.abs.gov.au</a></li>
+      <li>ABS Australian National Accounts: State Accounts, 2024-25 (released 20 November 2025), chain volume measures. <a href="https://www.abs.gov.au/statistics/economy/national-accounts/australian-national-accounts-state-accounts/latest-release">ABS release</a></li>
+      <li>ABS International Trade: Supplementary Information, Financial Year, 2024-25 (released 17 December 2025), services exports by state. <a href="https://www.abs.gov.au/statistics/economy/international-trade/international-trade-supplementary-information-financial-year/latest-release">ABS release</a></li>
+      <li>ABS release calendar. <a href="https://www.abs.gov.au/release-calendar/future-releases">abs.gov.au/release-calendar/future-releases</a></li>
+      <li>RBA cash rate target. <a href="https://www.rba.gov.au/statistics/cash-rate/">rba.gov.au/statistics/cash-rate</a>; RBA exchange rates. <a href="https://www.rba.gov.au/statistics/frequency/exchange-rates.html">rba.gov.au/statistics/frequency/exchange-rates.html</a>; RBA Monetary Policy Board meeting dates. <a href="https://www.rba.gov.au/schedules-events/board-meeting-schedules.html">RBA schedule</a></li>
+      <li>RBA table F2.1 (10-year government bond yield, monthly) and Google News headlines, via the open-source NSW Economic Dashboard pipeline. <a href="https://github.com/jfoong123/NSW-Economic-Dashboard">github.com/jfoong123/NSW-Economic-Dashboard</a></li>
+      <li>ASIC Insolvency statistics, Series 1, Table 1.3 (principal place of business). <a href="https://asic.gov.au/regulatory-resources/find-a-document/statistics/insolvency-statistics/insolvency-statistics-current">ASIC insolvency statistics (current)</a></li>
+      <li>NAB Monthly Business Survey. <a href="https://www.nab.com.au/news/economy-markets">NAB economics</a></li>
+      <li>Cotality Home Value Index. <a href="https://discover.cotality.com/hubfs/Article-Reports/COTALITY%20HVI%20OCT%202026%20FINAL.pdf">October 2026 release (PDF)</a></li>
+      <li>NSW National Housing Accord target of 377,000 homes over five years from 1 July 2024. <a href="https://www.planning.nsw.gov.au/policy-and-legislation/housing">NSW Department of Planning, Housing and Infrastructure</a></li>
+      <li>S&amp;P outlook change. <a href="https://www.nsw.gov.au/ministerial-releases/sp-global-upgrades-new-south-wales-outlook">NSW Government media release, 11 September 2026</a></li>
+    </ul>
+    <h2 class="td-h2" id="data-sources">Data files and last updates</h2>
+    <div class="card"><div class="tbl-wrap"><table class="tb left" id="tb-sources"><thead><tr><th>Source</th><th>What it holds</th><th>Last updated</th><th>Data file</th></tr></thead><tbody data-draw="tb-sources"></tbody></table></div></div>
+  </section>
+</div>
+
+<script>
+// ---------- calculations (visible in Sources) ----------
+dash.calc('c_sfd_growth', {
+  inputs: ['abs_sfd_nsw'], title: 'NSW SFD growth, TTY',
+  description: 'Real state final demand, per cent change on the same quarter a year earlier.',
+  fn: (abs_sfd_nsw) => { const r = abs_sfd_nsw, g = (a, b) => (a == null || b == null) ? null : +((a / b - 1) * 100).toFixed(2); return r.slice(4).map((x, i) => ({ quarter: x.quarter, sa_tty: g(x.sfd_sa, r[i].sfd_sa), trend_tty: g(x.sfd_trend, r[i].sfd_trend) })); }
+});
+dash.calc('c_emp_growth', {
+  inputs: ['abs_labour_nsw'], title: 'NSW employment growth, TTY',
+  description: 'Employed persons, per cent change on the same month a year earlier.',
+  fn: (abs_labour_nsw) => { const r = abs_labour_nsw, g = (a, b) => (a == null || b == null) ? null : +((a / b - 1) * 100).toFixed(2); return r.slice(12).map((x, i) => ({ month: x.month, sa_tty: g(x.emp_sa, r[i].emp_sa), trend_tty: g(x.emp_trend, r[i].emp_trend) })); }
+});
+dash.calc('c_cpi_tty', {
+  inputs: ['abs_cpi_quarterly'], title: 'CPI growth, TTY (quarterly)',
+  description: 'All groups CPI index, per cent change on the same quarter a year earlier.',
+  fn: (abs_cpi_quarterly) => { const r = abs_cpi_quarterly, g = (a, b) => +((a / b - 1) * 100).toFixed(2); return r.slice(4).map((x, i) => ({ quarter: x.quarter, sydney: g(x.sydney_index, r[i].sydney_index), capitals: g(x.capitals_index, r[i].capitals_index) })); }
+});
+dash.calc('c_wages', {
+  inputs: ['abs_wpi', 'c_cpi_tty'], title: 'Wages against prices',
+  description: 'Wage price index growth for NSW (all, private, public) and Australia, and NSW real wage growth: NSW wage growth less Sydney CPI growth in the same quarter.',
+  fn: (abs_wpi, c_cpi_tty) => { const cpi = new Map(c_cpi_tty.map(r => [r.quarter, r.sydney])); return abs_wpi.map(r => ({ quarter: r.quarter, nsw: r.nsw_tty, nsw_private: r.nsw_private_tty, nsw_public: r.nsw_public_tty, aus: r.aus_tty, sydney_cpi: cpi.has(r.quarter) ? cpi.get(r.quarter) : null, real: cpi.has(r.quarter) ? +(r.nsw_tty - cpi.get(r.quarter)).toFixed(2) : null })); }
+});
+dash.calc('c_housing', {
+  inputs: ['abs_approvals_nsw', 'abs_completions'], title: 'NSW housing pipeline, rolling 12 months',
+  description: 'Dwelling approvals summed over 12 months (houses and other), and commencements and completions summed over four quarters, placed at each quarter-end month.',
+  fn: (abs_approvals_nsw, abs_completions) => {
+    const a = abs_approvals_nsw, c = abs_completions, out = new Map();
+    for (let i = 11; i < a.length; i++) { const w = a.slice(i - 11, i + 1); out.set(a[i].month, { month: a[i].month, houses_12m: w.reduce((s, d) => s + d.houses, 0), other_12m: w.reduce((s, d) => s + d.other_dwellings, 0), commenced_12m: null, completed_12m: null }); }
+    for (let i = 3; i < c.length; i++) { const w = c.slice(i - 3, i + 1), q = c[i].quarter, m = q.slice(0, 4) + '-' + String(+q.slice(-1) * 3).padStart(2, '0'); const row = out.get(m) || { month: m, houses_12m: null, other_12m: null }; row.commenced_12m = w.reduce((s, d) => s + d.commencements, 0); row.completed_12m = w.reduce((s, d) => s + d.completions, 0); out.set(m, row); }
+    return [...out.values()].sort((x, y) => x.month < y.month ? -1 : 1);
+  }
+});
+dash.calc('c_pop_growth', {
+  inputs: ['abs_population'], title: 'Population growth, NSW and Australia',
+  description: 'Estimated resident population, per cent change on the same quarter a year earlier.',
+  fn: (abs_population) => {
+    const by = s => abs_population.filter(r => r.state === s).sort((a, b) => a.quarter < b.quarter ? -1 : 1);
+    const n = by('NSW'), a = new Map(by('AUS').map(r => [r.quarter, r.erp])), g = (x, y) => +((x / y - 1) * 100).toFixed(2);
+    const yq = q => (+q.slice(0, 4) - 1) + q.slice(4);
+    return n.slice(4).map((r, i) => ({ quarter: r.quarter, nsw: g(r.erp, n[i].erp), aus: a.has(r.quarter) && a.has(yq(r.quarter)) ? g(a.get(r.quarter), a.get(yq(r.quarter))) : null }));
+  }
+});
+dash.calc('c_rev_share', {
+  inputs: ['revenue_mix'], title: 'Revenue shares, 2026-27',
+  description: 'Each revenue source as a share of total general government revenue, grouped as in the 2019 dashboard.',
+  fn: (revenue_mix) => { const t = revenue_mix.reduce((s, d) => s + d.amount_m, 0); const grp = c => /^Taxation/.test(c) ? 'Taxation' : /GST|Agreement|Other grants/.test(c) ? 'Grants and subsidies' : /Sale of goods/.test(c) ? 'Sale of goods and services' : /ividend/.test(c) ? 'Dividends and distributions' : 'Fines, fees, royalties and other'; return revenue_mix.map(d => ({ component: d.component, group: grp(d.component), amount_m: d.amount_m, share_pct: +(d.amount_m / t * 100).toFixed(1) })); }
+});
+dash.calc('c_exp_share', {
+  inputs: ['expense_mix'], title: 'Expense shares, 2026-27',
+  description: 'Each expense type as a share of total general government expenses.',
+  fn: (expense_mix) => { const t = expense_mix.reduce((s, d) => s + d.amount_m, 0); return expense_mix.map(d => ({ component: d.component, amount_m: d.amount_m, share_pct: +(d.amount_m / t * 100).toFixed(1) })); }
+});
+dash.calc('c_state_compare', {
+  inputs: ['abs_sfd_states', 'abs_labour_states', 'abs_spending_states', 'abs_population', 'abs_approvals_states', 'abs_completions_states', 'abs_wpi_states', 'abs_gsp_states'],
+  title: 'State vs state comparison',
+  description: 'Latest growth rates and levels by state; annual average growth compares the latest four quarters with the four before.',
+  fn: (abs_sfd_states, abs_labour_states, abs_spending_states, abs_population, abs_approvals_states, abs_completions_states, abs_wpi_states, abs_gsp_states) => {
+    const S = ['NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'AUS'], M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const ml = m => M[+m.slice(5, 7) - 1] + '-' + m.slice(2, 4), ql = q => M[(+q.slice(-1)) * 3 - 1] + 'Q-' + q.slice(2, 4);
+    const sum = (a, f) => a.reduce((s, d) => s + f(d), 0);
+    const by = (rows) => { const m = new Map(); rows.forEach(d => { if (!m.has(d.state)) m.set(d.state, []); m.get(d.state).push(d); }); m.forEach(v => v.sort((a, b) => (a.quarter || a.month) < (b.quarter || b.month) ? -1 : 1)); return m; };
+    const rank = (row, low) => { if (row.NSW == null) return null; const v = S.slice(0, 6).map(s => row[s]).filter(x => x != null); return 1 + v.filter(x => low ? x < row.NSW : x > row.NSW).length; };
+    const out = [];
+    const annAvg = (key, label) => { const g = by(abs_sfd_states), row = { indicator: label }; let lq = null; S.forEach(s => { const r = g.get(s) || []; if (r.length < 8) { row[s] = null; return; } const n = r.length; lq = r[n - 1].quarter; row[s] = +((sum(r.slice(n - 4), d => d[key]) / sum(r.slice(n - 8, n - 4), d => d[key]) - 1) * 100).toFixed(1); }); row.period = lq ? ql(lq) + ', annual avg' : null; row.nsw_rank = rank(row); out.push(row); };
+    const latest = (rows, key, label, per, low, dp = 1) => { const g = by(rows), row = { indicator: label }; let lp = null; S.forEach(s => { const r = g.get(s) || [], x = r[r.length - 1]; if (x) lp = x.quarter || x.month; row[s] = x && x[key] != null ? +(+x[key]).toFixed(dp) : null; }); row.period = lp ? per(lp) : null; row.nsw_rank = rank(row, low); out.push(row); };
+    annAvg('sfd_sa', 'State final demand, annual average growth %');
+    latest(abs_labour_states, 'unemp_sa', 'Unemployment rate %', ml, true);
+    annAvg('business_investment_sa', 'Business investment, annual average growth %');
+    latest(abs_wpi_states, 'wpi_tty', 'Wage price index, TTY growth %', ql, false);
+    latest(abs_spending_states, 'spending_tty', 'Household spending, TTY growth %', ml, false);
+    { const g = by(abs_population), row = { indicator: 'Population, TTY growth %' }; let lq = null; S.forEach(s => { const r = g.get(s) || []; if (r.length < 5) { row[s] = null; return; } const n = r.length; lq = r[n - 1].quarter; row[s] = +((r[n - 1].erp / r[n - 5].erp - 1) * 100).toFixed(1); }); row.period = lq ? ql(lq) : null; row.nsw_rank = rank(row); out.push(row); }
+    { const g = by(abs_approvals_states), row = { indicator: 'Dwelling approvals, 12-month sum' }; let lm = null; S.forEach(s => { const r = g.get(s) || []; if (r.length < 12) { row[s] = null; return; } lm = r[r.length - 1].month; row[s] = sum(r.slice(-12), d => d.dwellings); }); row.period = lm ? 'Year to ' + ml(lm) : null; row.nsw_rank = rank(row); out.push(row); }
+    { const g = by(abs_completions_states), row = { indicator: 'Dwelling completions, 12-month sum' }; let lq = null; S.forEach(s => { const r = g.get(s) || []; if (r.length < 4) { row[s] = null; return; } lq = r[r.length - 1].quarter; row[s] = sum(r.slice(-4), d => d.completions); }); row.period = lq ? 'Year to ' + ql(lq) : null; row.nsw_rank = rank(row); out.push(row); }
+    { const ys = [...new Set(abs_gsp_states.map(r => r.year))].sort(), y = ys[ys.length - 1]; const f = (k, label) => { const row = { indicator: label, period: y }; S.forEach(s => { const x = abs_gsp_states.find(r => r.year === y && r.state === s); row[s] = x ? x[k] : null; }); row.nsw_rank = rank(row); out.push(row); }; f('gsp_growth', 'Real gross state product growth %'); f('gsp_pc_growth', 'Real GSP per capita growth %'); }
+    return out;
+  }
+});
+dash.calc('c_fast', {
+  inputs: ['budget_aggregates', 'budget_facts', 'outlook', 'abs_sfd_nsw', 'abs_labour_nsw', 'abs_labour_states', 'abs_population', 'abs_interstate', 'abs_approvals_states', 'abs_approvals_regions', 'abs_completions', 'abs_spending', 'abs_cpi_monthly', 'abs_cpi_quarterly', 'abs_wpi', 'nab_survey', 'rba_cash_rate', 'asic_insolvency', 'property_sydney', 'abs_exports', 'abs_gsp_states', 'abs_gdp', 'bond10', 'rba_fx', 'refs'],
+  title: 'Fast figures',
+  description: 'Headline values for each tile, with the two comparison figures shown beneath it and whether the change is positive or negative.',
+  fn: (budget_aggregates, budget_facts, outlook, abs_sfd_nsw, abs_labour_nsw, abs_labour_states, abs_population, abs_interstate, abs_approvals_states, abs_approvals_regions, abs_completions, abs_spending, abs_cpi_monthly, abs_cpi_quarterly, abs_wpi, nab_survey, rba_cash_rate, asic_insolvency, property_sydney, abs_exports, abs_gsp_states, abs_gdp, bond10, rba_fx, refs) => {
+    const M = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const ml = m => M[+m.slice(5, 7) - 1] + '-' + m.slice(2, 4), ql = q => M[(+q.slice(-1)) * 3 - 1] + 'Q-' + q.slice(2, 4);
+    const dl = d => +d.slice(8, 10) + ' ' + M[+d.slice(5, 7) - 1] + ' ' + d.slice(0, 4);
+    const pc = (v, d = 1) => v == null ? 'n.a.' : (+v).toFixed(d) + '%';
+    const sg = (v, d = 1) => v == null ? 'n.a.' : (v > 0 ? '+' : '') + (+v).toFixed(d);
+    const bn = v => (v < 0 ? '-' : '') + '$' + Math.abs(v).toFixed(1) + 'b';
+    const g = (a, b) => (a / b - 1) * 100, jun = y => 'Jun-' + y.slice(5, 7);
+    const sortBy = (rows, k) => rows.slice().sort((a, b) => a[k] < b[k] ? -1 : 1);
+    const sum = (a, f) => a.reduce((s, d) => s + f(d), 0), fmtN = v => Math.round(v).toLocaleString('en-AU');
+    const out = [], add = (id, value_text, period, a_label, a_text, b_label, b_text, tone) => out.push({ id, value_text, period, a_label, a_text, b_label, b_text, tone });
+    const tone = (better, worse) => better ? 'good' : (worse ? 'bad' : 'neutral');
+    // Fiscal
+    const B = budget_aggregates, bi = B.findIndex(r => r.status === 'Budget'), b = B[bi], bp = B[bi - 1], bl = B[B.length - 1];
+    add('budget', bn(b.budget_result), b.year + ' Budget', bp.year, bn(bp.budget_result), bl.year, bn(bl.budget_result), tone(b.budget_result > bp.budget_result, b.budget_result < bp.budget_result));
+    const avg = sum(B.slice(bi), r => r.budget_result) / B.slice(bi).length;
+    add('avg_result', bn(avg), b.year + ' to ' + bl.year, 'Budget year', bn(b.budget_result), 'Final year', bn(bl.budget_result), tone(avg > 0, avg < 0));
+    add('expense', pc(b.expense_growth), b.year, bp.year, pc(bp.expense_growth), bl.year, pc(bl.expense_growth), tone(b.expense_growth < bp.expense_growth, b.expense_growth > bp.expense_growth));
+    add('net_debt', bn(bp.net_debt_june), jun(bp.year), jun(b.year), bn(b.net_debt_june), jun(bl.year), bn(bl.net_debt_june), tone(b.net_debt_june < bp.net_debt_june, b.net_debt_june > bp.net_debt_june));
+    add('interest', bn(b.interest_expense), b.year, bp.year, bn(bp.interest_expense), bl.year, bn(bl.interest_expense), tone(b.interest_expense < bp.interest_expense, b.interest_expense > bp.interest_expense));
+    add('super', bn(bp.super_provision_june), jun(bp.year) + ', net provision', jun(b.year), bn(b.super_provision_june), jun(bl.year), bn(bl.super_provision_june), tone(b.super_provision_june < bp.super_provision_june, b.super_provision_june > bp.super_provision_june));
+    const f = k => budget_facts.find(r => r.key === k);
+    add('credit', f('credit_moodys').value + ' / ' + f('credit_fitch').value, "Moody's / Fitch", 'S&P Global', f('credit_sp').value, 'S&P action', f('credit_sp').note.replace(/^.*, /, ''), 'neutral');
+    // Economy, jobs and population
+    const gy = [...new Set(abs_gsp_states.map(r => r.year))].sort(), gyl = gy[gy.length - 1], gs = s => (abs_gsp_states.find(r => r.year === gyl && r.state === s) || {}).gsp_growth;
+    const O = outlook.find(r => /Real gross state product/.test(r.indicator)), nk = 'y' + (+gyl.slice(0, 4) + 1) + '_' + String(+gyl.slice(5, 7) + 1).padStart(2, '0');
+    add('gsp', pc(gs('NSW')), gyl + ', real (ABS)', 'Australia', pc(gs('AUS')), (+gyl.slice(0, 4) + 1) + '-' + String(+gyl.slice(5, 7) + 1).padStart(2, '0') + ' Treasury f', O && O[nk] != null ? O[nk] + '%' : 'n.a.', tone(gs('NSW') > gs('AUS'), gs('NSW') < gs('AUS')));
+    const sf = abs_sfd_nsw, n = sf.length, s0 = g(sf[n - 1].sfd_sa, sf[n - 5].sfd_sa), s1 = g(sf[n - 2].sfd_sa, sf[n - 6].sfd_sa), s4 = g(sf[n - 5].sfd_sa, sf[n - 9].sfd_sa);
+    add('sfd', pc(s0), ql(sf[n - 1].quarter) + ', TTY', ql(sf[n - 2].quarter), pc(s1), ql(sf[n - 5].quarter), pc(s4), tone(s0 > s1, s0 < s1));
+    const L = abs_labour_nsw, ln = L.length, l0 = L[ln - 1], l1 = L[ln - 2], l12 = L[ln - 13];
+    add('unemp', pc(l0.unemp_sa), ml(l0.month) + ', seasonally adjusted', ml(l1.month), pc(l1.unemp_sa), ml(l12.month), pc(l12.unemp_sa), tone(+l0.unemp_sa.toFixed(1) < +l1.unemp_sa.toFixed(1), +l0.unemp_sa.toFixed(1) > +l1.unemp_sa.toFixed(1)));
+    const e0 = g(l0.emp_sa, l12.emp_sa), e1 = g(l1.emp_sa, L[ln - 14].emp_sa), e12 = g(l12.emp_sa, L[ln - 25].emp_sa);
+    add('emp', pc(e0), ml(l0.month) + ', TTY', ml(l1.month), pc(e1), ml(l12.month), pc(e12), tone(+e0.toFixed(1) > +e1.toFixed(1), +e0.toFixed(1) < +e1.toFixed(1)));
+    add('part', pc(l0.part_sa), ml(l0.month) + ', seasonally adjusted', ml(l1.month), pc(l1.part_sa), ml(l12.month), pc(l12.part_sa), tone(+l0.part_sa.toFixed(1) > +l1.part_sa.toFixed(1), +l0.part_sa.toFixed(1) < +l1.part_sa.toFixed(1)));
+    const A = sortBy(abs_labour_states.filter(r => r.state === 'AUS'), 'month'), an = A.length;
+    add('aus_unemp', pc(A[an - 1].unemp_sa), ml(A[an - 1].month) + ', seasonally adjusted', ml(A[an - 2].month), pc(A[an - 2].unemp_sa), ml(A[an - 13].month), pc(A[an - 13].unemp_sa), tone(+A[an - 1].unemp_sa.toFixed(1) < +A[an - 2].unemp_sa.toFixed(1), +A[an - 1].unemp_sa.toFixed(1) > +A[an - 2].unemp_sa.toFixed(1)));
+    const P = sortBy(abs_population.filter(r => r.state === 'NSW'), 'quarter'), pn = P.length, p0 = g(P[pn - 1].erp, P[pn - 5].erp), p1 = g(P[pn - 2].erp, P[pn - 6].erp), p4 = g(P[pn - 5].erp, P[pn - 9].erp);
+    add('pop', pc(p0), ql(P[pn - 1].quarter) + ', TTY', ql(P[pn - 2].quarter), pc(p1), ql(P[pn - 5].quarter), pc(p4), 'neutral');
+    const IM = sortBy(abs_interstate, 'quarter'), imn = IM.length, iy = sum(IM.slice(-4), d => d.net_interstate), iyp = sum(IM.slice(-8, -4), d => d.net_interstate);
+    add('interstate', fmtN(-IM[imn - 1].net_interstate), ql(IM[imn - 1].quarter) + ', net loss of persons', 'Year to ' + ql(IM[imn - 1].quarter), fmtN(-iy), 'Prior year', fmtN(-iyp), tone(iy > iyp, iy < iyp));
+    // Wages, prices and rates
+    const C = abs_cpi_monthly, cn = C.length, Q = abs_cpi_quarterly, qn = Q.length, cq = g(Q[qn - 1].sydney_index, Q[qn - 5].sydney_index);
+    add('cpi', pc(C[cn - 1].sydney_tty), ml(C[cn - 1].month) + ', Sydney, TTY', ml(C[cn - 2].month), pc(C[cn - 2].sydney_tty), ql(Q[qn - 1].quarter), pc(cq), tone(C[cn - 1].sydney_tty < C[cn - 2].sydney_tty, C[cn - 1].sydney_tty > C[cn - 2].sydney_tty));
+    const W = abs_wpi, wn = W.length, w0 = W[wn - 1], w1 = W[wn - 2];
+    add('wpi', pc(w0.nsw_tty), ql(w0.quarter) + ', NSW, TTY', 'Private', pc(w0.nsw_private_tty), 'Public', pc(w0.nsw_public_tty), tone(w0.nsw_tty > w1.nsw_tty, w0.nsw_tty < w1.nsw_tty));
+    const qi = new Map(Q.map(r => [r.quarter, r.sydney_index])), yq = q => (+q.slice(0, 4) - 1) + q.slice(4);
+    const cpiQ = q => qi.has(q) && qi.has(yq(q)) ? g(qi.get(q), qi.get(yq(q))) : null, rw = W.filter(r => cpiQ(r.quarter) != null), r0 = rw[rw.length - 1], ry = rw.find(r => r.quarter === yq(r0.quarter));
+    const real0 = r0.nsw_tty - cpiQ(r0.quarter), realy = ry ? ry.nsw_tty - cpiQ(ry.quarter) : null;
+    add('real_wage', sg(real0) + ' pts', ql(r0.quarter) + ', NSW wages less Sydney CPI', 'Wage growth', pc(r0.nsw_tty), 'Sydney CPI', pc(cpiQ(r0.quarter)), tone(real0 > 0, real0 < 0));
+    const H = abs_spending, hn = H.length;
+    add('spend', pc(H[hn - 1].nsw_tty), ml(H[hn - 1].month) + ', TTY, nominal', ml(H[hn - 2].month), pc(H[hn - 2].nsw_tty), 'Australia', pc(H[hn - 1].aus_tty), tone(H[hn - 1].nsw_tty > H[hn - 1].aus_tty, H[hn - 1].nsw_tty < H[hn - 1].aus_tty));
+    const R = sortBy(rba_cash_rate, 'date'), c0 = R[R.length - 1], c1 = R.slice().reverse().find(x => x.cash_rate !== c0.cash_rate);
+    add('cash', c0.cash_rate.toFixed(2) + '%', 'Since ' + dl(c0.date), 'Previous', c1 ? c1.cash_rate.toFixed(2) + '%' : 'n.a.', 'Last change', c1 ? (c0.cash_rate > c1.cash_rate ? '+' : '') + Math.round((c0.cash_rate - c1.cash_rate) * 100) + ' bp' : 'n.a.', tone(c1 && c0.cash_rate < c1.cash_rate, c1 && c0.cash_rate > c1.cash_rate));
+    const N = sortBy(nab_survey, 'month'), nb = N[N.length - 1];
+    add('nab', String(nb.business_conditions), ml(nb.month) + ', NAB index, national', 'Change', sg(nb.conditions_change, 0), 'Confidence', String(nb.business_confidence), tone(nb.business_conditions > 0, nb.business_conditions < 0));
+    // Housing and business
+    const BA = sortBy(abs_approvals_states.filter(r => r.state === 'NSW'), 'month'), ban = BA.length, a12 = sum(BA.slice(-12), d => d.dwellings), a12p = sum(BA.slice(-13, -1), d => d.dwellings);
+    const RN = sortBy(abs_approvals_regions.filter(r => r.region === 'Rest of NSW'), 'month'), rn12 = sum(RN.slice(-12), d => d.dwellings), rn12p = sum(RN.slice(-24, -12), d => d.dwellings);
+    add('approvals', fmtN(a12), 'Year to ' + ml(BA[ban - 1].month), 'Year to ' + ml(BA[ban - 2].month), fmtN(a12p), 'Regional NSW', fmtN(rn12) + ' (' + sg(g(rn12, rn12p)) + '% TTY)', tone(a12 > a12p, a12 < a12p));
+    const CO = sortBy(abs_completions, 'quarter'), con = CO.length, pace = (refs.find(r => r.key === 'accord_annual_pace') || {}).value;
+    const k4 = sum(CO.slice(-4), d => d.commencements), k4y = sum(CO.slice(-8, -4), d => d.commencements);
+    add('commence', fmtN(k4), 'Year to ' + ql(CO[con - 1].quarter), 'Year to ' + ql(CO[con - 5].quarter), fmtN(k4y), ql(CO[con - 1].quarter) + ' quarter', fmtN(CO[con - 1].commencements), tone(k4 > k4y, k4 < k4y));
+    const c4 = sum(CO.slice(-4), d => d.completions), c4y = sum(CO.slice(-8, -4), d => d.completions);
+    add('completions', fmtN(c4), 'Year to ' + ql(CO[con - 1].quarter), 'Year to ' + ql(CO[con - 5].quarter), fmtN(c4y), 'Housing Accord pace', pace ? fmtN(pace) + ' a year' : 'n.a.', tone(pace && c4 >= pace, pace && c4 < pace));
+    const PR = k => property_sydney.find(r => r.segment === k), mv = v => v >= 1e6 ? '$' + (v / 1e6).toFixed(2) + 'm' : '$' + Math.round(v / 1e3) + 'k';
+    const pd = PR('All dwellings'), ph = PR('Houses'), pu = PR('Units');
+    add('property', mv(pd.median_value), M[+pd.month.slice(5, 7) - 1] + ' ' + pd.month.slice(0, 4), 'Houses', mv(ph.median_value), 'Units', mv(pu.median_value), tone(pd.yoy_pct > 0, pd.yoy_pct < 0));
+    add('property_h', mv(ph.median_value), pd.month, 'Year', sg(ph.yoy_pct) + '%', 'Month', sg(ph.mom_pct) + '%', 'neutral');
+    add('property_u', mv(pu.median_value), pd.month, 'Year', sg(pu.yoy_pct) + '%', 'Month', sg(pu.mom_pct) + '%', 'neutral');
+    const I = sortBy(asic_insolvency, 'month'), inn = I.length, i12 = sum(I.slice(-12), d => d.nsw), i12p = sum(I.slice(-24, -12), d => d.nsw);
+    add('insolv', fmtN(I[inn - 1].nsw), ml(I[inn - 1].month) + ', NSW companies', 'Year to ' + ml(I[inn - 1].month), fmtN(i12), 'Prior year', fmtN(i12p), tone(i12 < i12p, i12 > i12p));
+    const X = abs_exports.find(r => r.kind === 'Total'), gr = B.find(r => r.status === 'Revised') || bp;
+    add('exports', bn(X.value_m / 1000), X.period, gr.year + ' nominal GSP', pc(X.value_m / 1000 / gr.gsp_nominal * 100), 'GSP', '$' + gr.gsp_nominal.toFixed(1) + 'b', 'neutral');
+    // National and markets
+    const G = sortBy(abs_gdp, 'quarter'), gn = G.length, g0 = G[gn - 1], g1 = G[gn - 2];
+    add('gdp', pc(g0.gdp_qoq), ql(g0.quarter) + ', real, quarterly', 'Per capita', pc(g0.gdp_pc_qoq), ql(g1.quarter), pc(g1.gdp_qoq), tone(g0.gdp_pc_qoq > 0, g0.gdp_pc_qoq < 0));
+    const Y = sortBy(bond10, 'month'), yn = Y.length, y0 = Y[yn - 1], y1 = Y[yn - 2], y12 = Y.find(r => r.month === (+y0.month.slice(0, 4) - 1) + y0.month.slice(4));
+    add('bond', pc(y0.yield_pct, 2), ml(y0.month) + ', monthly average', ml(y1.month), pc(y1.yield_pct, 2), y12 ? ml(y12.month) : 'Year earlier', y12 ? pc(y12.yield_pct, 2) : 'n.a.', tone(y0.yield_pct < y1.yield_pct, y0.yield_pct > y1.yield_pct));
+    const FX = sortBy(rba_fx, 'date'), fn_ = FX.length, f0 = FX[fn_ - 1], f1 = FX[fn_ - 2];
+    add('fx', 'US' + f0.usd.toFixed(4), dl(f0.date) + ', RBA 4pm', f1 ? dl(f1.date) : 'Previous', f1 ? 'US' + f1.usd.toFixed(4) : 'n.a.', 'Trade-weighted index', f0.twi != null ? f0.twi.toFixed(1) : 'n.a.', 'neutral');
+    return out;
+  }
+});
+dash.calc('c_tax_summary', {
+  inputs: ['taxation', 'budget_aggregates'], title: 'Taxation, 2019 dashboard groups',
+  description: 'Budget-year taxation grouped as in the 2019 dashboard, as a share of total taxation and of total general government revenue.',
+  fn: (taxation, budget_aggregates) => {
+    const yk = Object.keys(taxation[0]).filter(k => /^y\d/.test(k)).sort(), y = yk[yk.length - 1];
+    const v = n => { const r = taxation.find(x => x.tax === n); return r ? r[y] : 0; };
+    const groups = [['Transfer duty', ['Transfer duty']], ['Payroll tax', ['Payroll tax']], ['Land tax', ['Land tax']], ['Other tax revenue', ['Other taxes and levies', 'Other (property tax, other stamp duties)']], ['Taxes on motor vehicle ownership and operation', ['Motor vehicle weight tax and charges']], ['Gambling and betting', ['Gambling and betting taxes']], ['Other stamp duties', ['Insurance duty', 'Motor vehicle stamp duty']]];
+    const total = taxation.reduce((s, r) => s + r[y], 0), rev = budget_aggregates.find(r => r.status === 'Budget').revenue * 1000;
+    return groups.map(([name, parts]) => { const a = parts.reduce((s, p) => s + v(p), 0), st = +(a / total * 100).toFixed(1); return { tax: name, amount_m: a, share_of_tax_pct: st, share_of_tax_text: st.toFixed(1) + '% ($' + Math.round(a).toLocaleString('en-AU') + 'm)', share_of_revenue_pct: +(a / rev * 100).toFixed(1) }; });
+  }
+});
+dash.calc('c_td_callout', {
+  inputs: ['taxation'], title: 'Transfer duty callout',
+  description: 'Budget-year transfer duty and its change on the previous year.',
+  fn: (taxation) => { const r = taxation.find(x => x.tax === 'Transfer duty'), yk = Object.keys(r).filter(k => /^y\d/.test(k)).sort(), a = r[yk[yk.length - 1]], p = r[yk[yk.length - 2]], ch = a - p; return [{ id: 'td', amount_text: '$' + Math.round(a).toLocaleString('en-AU') + 'm', dir_text: ch < 0 ? 'down' : 'up', change_text: '$' + Math.round(Math.abs(ch)).toLocaleString('en-AU') + 'm (' + Math.abs(ch / p * 100).toFixed(1) + '%)' }]; }
+});
+dash.calc('c_exports_fy', {
+  inputs: ['exports_fy', 'budget_aggregates'], title: 'NSW exports and GSP, financial year',
+  description: 'Goods plus services exports for the financial year, as a share of nominal gross state product for the same year.',
+  fn: (exports_fy, budget_aggregates) => { const gd = exports_fy.find(r => r.kind === 'Total' && /Merchandise/.test(r.item)), sv = exports_fy.find(r => r.kind === 'Total' && /Services/.test(r.item)), per = gd.period, gsp = budget_aggregates.find(r => r.year === per).gsp_nominal, tot = (gd.value_m + sv.value_m) / 1000, b = v => '$' + v.toFixed(1) + ' billion'; return [{ id: 'band', period: per, total_text: b(tot), share_text: (tot / gsp * 100).toFixed(1) + '%', gsp_text: b(gsp), goods_text: b(gd.value_m / 1000), services_text: b(sv.value_m / 1000) }]; }
+});
+
+// ---------- helpers ----------
+const MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const parseP = (p) => { if (/^\d{4}-\d{2}$/.test(p)) return new Date(Date.UTC(+p.slice(0, 4), +p.slice(5, 7) - 1, 1)); if (/^\d{4}-Q\d$/.test(p)) return new Date(Date.UTC(+p.slice(0, 4), (+p.slice(-1)) * 3 - 1, 1)); if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return new Date(p + 'T00:00:00Z'); return null; };
+const lab = (p) => { if (/^\d{4}-\d{2}$/.test(p)) return MON[+p.slice(5, 7) - 1] + ' ' + p.slice(0, 4); if (/Q/.test(p)) return MON[(+p.slice(-1)) * 3 - 1] + ' qtr ' + p.slice(0, 4); if (/^\d{4}-\d{2}-\d{2}$/.test(p)) return +p.slice(8, 10) + ' ' + MON[+p.slice(5, 7) - 1] + ' ' + p.slice(0, 4); return p; };
+const col = (i) => dash.colors[i % dash.colors.length];
+const D = (id) => dash.data(id);
+const ok = (...ids) => ids.every(i => D(i).status === 'ok');
+const bad = (...ids) => ids.some(i => ['error', 'declined', 'missing', 'connect'].includes(D(i).status));
+const pct1 = v => d3.format('.1f')(v);
+const failBox = (box) => { box.classList.remove('dash-skeleton'); box.replaceChildren(); const d = document.createElement('div'); d.className = 'failed'; d.textContent = 'Failed to load'; box.append(d); };
+const election = () => { const r = D('refs'); return r.status === 'ok' ? (r.data.find(x => x.key === 'election_2023') || {}).date : null; };
+
+document.querySelectorAll('.legend .sw[data-c]').forEach(el => { el.style.setProperty('--c', col(+el.dataset.c)); });
+
+function measure(svg, texts) { const g = svg.append('g'); const w = texts.map(t => g.append('text').attr('class', 'tk').text(t).node().getComputedTextLength()); g.remove(); return d3.max(w) || 0; }
+function addTooltip(box, svg, W, H, ml, mr, pts, render) {
+  const tt = document.createElement('div'); tt.className = 'tt'; box.append(tt);
+  const marker = svg.append('g').style('display', 'none');
+  svg.append('rect').attr('x', ml).attr('y', 0).attr('width', Math.max(0, W - ml - mr)).attr('height', H).attr('fill', 'transparent')
+    .on('pointermove', (ev) => { const [mx] = d3.pointer(ev); const d = pts(mx); if (!d) return; marker.style('display', null).selectAll('*').remove(); render(d, tt, marker); const bw = box.clientWidth, tw = tt.offsetWidth, px = (d.px / W) * bw; let left = px + 12; if (left + tw > bw) left = px - tw - 12; tt.style.left = Math.max(0, left) + 'px'; tt.style.top = '4px'; tt.style.opacity = 1; })
+    .on('pointerleave', () => { tt.style.opacity = 0; marker.style('display', 'none'); });
+}
+function ttHead(tt, text) { tt.replaceChildren(); const h = document.createElement('div'); h.className = 'tt-h'; h.textContent = text; tt.append(h); }
+function ttRow(tt, color, label, value) { const row = document.createElement('div'); if (color) { const sw = document.createElement('i'); sw.style.background = color; row.append(sw); } row.append((label ? label + ': ' : '') + value); tt.append(row); }
+function electionMark(svg, x, H, mb, mt) { const e = election(); if (!e) return; const d = parseP(e), [d0, d1] = x.domain(); if (d < d0 || d > d1) return; const xx = x(d); svg.append('line').attr('class', 'rl').attr('x1', xx).attr('x2', xx).attr('y1', mt).attr('y2', H - mb); svg.append('text').attr('class', 'tk').attr('x', xx + 4).attr('y', mt + 10).text('Minns Govt'); }
+
+function lineChart(box, rows, o) {
+  const W = Math.max(260, box.clientWidth), H = o.h || 220, mb = 22, mt = 8;
+  let data = rows.map(r => ({ x: parseP(r[o.x]), p: r[o.x], r })).filter(d => d.x);
+  if (o.from) data = data.filter(d => d.x >= parseP(o.from));
+  data.sort((a, b) => a.x - b.x);
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const vals = data.flatMap(d => o.series.map(s => d.r[s.key])).filter(v => v != null && !isNaN(v));
+  if (!vals.length) { svg.remove(); return; }
+  let [lo, hi] = d3.extent(vals); if (o.zero) { lo = Math.min(0, lo); hi = Math.max(0, hi); }
+  const y = d3.scaleLinear([lo, hi], [H - mb, mt]).nice(5), ticks = y.ticks(5), fmt = o.fmt || (v => d3.format('.1f')(v));
+  const ml = Math.ceil(measure(svg, ticks.map(fmt))) + 10, mr = 10;
+  const x = d3.scaleUtc(d3.extent(data, d => d.x), [ml, W - mr]);
+  svg.append('g').selectAll('line').data(ticks).join('line').attr('class', d => d === 0 ? 'zl' : 'gl').attr('x1', ml).attr('x2', W - mr).attr('y1', d => y(d)).attr('y2', d => y(d));
+  svg.append('g').selectAll('text').data(ticks).join('text').attr('class', 'tk').attr('x', ml - 6).attr('y', d => y(d) + 4).attr('text-anchor', 'end').text(fmt);
+  const span = (x.domain()[1] - x.domain()[0]) / 3.15e10, xt = x.ticks(Math.max(2, Math.min(span > 3 ? Math.ceil(span) : 6, Math.floor((W - ml) / 70))));
+  svg.append('g').selectAll('text').data(xt).join('text').attr('class', 'tk').attr('x', d => x(d)).attr('y', H - 4).attr('text-anchor', 'middle').text(d3.utcFormat(span > 3 ? '%Y' : '%b %y'));
+  if (o.election !== false) electionMark(svg, x, H, mb, mt);
+  o.series.forEach((s) => { const ln = (o.step ? d3.line().curve(d3.curveStepAfter) : d3.line()).defined(d => d.r[s.key] != null && !isNaN(d.r[s.key])).x(d => x(d.x)).y(d => y(d.r[s.key])); svg.append('path').datum(data).attr('class', 'ln').attr('stroke', col(s.c)).attr('stroke-dasharray', s.dash ? '4 3' : null).attr('d', ln); });
+  const bis = d3.bisector(d => d.x).center;
+  addTooltip(box, svg, W, H, ml, mr, (mx) => { const d = data[bis(data, x.invert(mx))]; return d ? { ...d, px: x(d.x) } : null; }, (d, tt, m) => {
+    ttHead(tt, lab(d.p));
+    o.series.forEach((s) => { const v = d.r[s.key]; if (v == null) return; ttRow(tt, o.series.length > 1 ? col(s.c) : null, o.series.length > 1 ? s.label : '', (o.tfmt || fmt)(v)); m.append('circle').attr('cx', x(d.x)).attr('cy', y(v)).attr('r', 4).attr('fill', col(s.c)); });
+  });
+}
+function barChart(box, rows, o) {
+  const W = Math.max(260, box.clientWidth), H = o.h || 220, mb = 22, mt = 14;
+  const data = o.from ? rows.filter(r => r[o.x] >= o.from) : rows;
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const keys = o.series.map(s => s.key), vals = data.flatMap(r => keys.map(k => r[k])).filter(v => v != null).concat([0]);
+  const y = d3.scaleLinear(d3.extent(vals), [H - mb, mt]).nice(5), ticks = y.ticks(5), fmt = o.fmt || d3.format(',');
+  const ml = Math.ceil(measure(svg, ticks.map(fmt))) + 10, mr = 6;
+  const x0 = d3.scaleBand(data.map(r => r[o.x]), [ml, W - mr]).paddingInner(o.pad ?? 0.2).paddingOuter(0.05), x1 = d3.scaleBand(keys, [0, x0.bandwidth()]).padding(0.08);
+  svg.append('g').selectAll('line').data(ticks).join('line').attr('class', d => d === 0 ? 'zl' : 'gl').attr('x1', ml).attr('x2', W - mr).attr('y1', d => y(d)).attr('y2', d => y(d));
+  svg.append('g').selectAll('text').data(ticks).join('text').attr('class', 'tk').attr('x', ml - 6).attr('y', d => y(d) + 4).attr('text-anchor', 'end').text(fmt);
+  const colorOf = (s, v, r) => typeof s.color === 'function' ? s.color(v, r) : col(s.c);
+  data.forEach(r => o.series.forEach((s) => { const v = r[s.key]; if (v == null) return; const bw = Math.min(32, x1.bandwidth()), xx = x0(r[o.x]) + x1(s.key) + (x1.bandwidth() - bw) / 2; svg.append('rect').attr('x', xx).attr('width', Math.max(1, bw)).attr('y', Math.min(y(v), y(0))).attr('height', Math.abs(y(v) - y(0))).attr('rx', Math.min(4, bw / 2)).attr('fill', colorOf(s, v, r)); if (o.labels && s.label_values) svg.append('text').attr('class', 'tk').attr('x', xx + bw / 2).attr('y', v >= 0 ? y(v) - 3 : y(v) + 11).attr('text-anchor', 'middle').text((o.lfmt || fmt)(v)); }));
+  const xl = o.xlab || (v => v), labelled = data.filter(r => xl(r[o.x]) !== ''), every = Math.max(1, Math.ceil(labelled.length / Math.max(1, Math.floor((W - ml) / 56))));
+  svg.append('g').selectAll('text').data(labelled.filter((r, i) => (labelled.length - 1 - i) % every === 0)).join('text').attr('class', 'tk').attr('x', r => x0(r[o.x]) + x0.bandwidth() / 2).attr('y', H - 4).attr('text-anchor', 'middle').text(r => (o.xlab || (v => v))(r[o.x]));
+  addTooltip(box, svg, W, H, ml, mr, (mx) => { const st = x0.step(), i = Math.max(0, Math.min(data.length - 1, Math.floor((mx - ml - x0.paddingOuter() * st) / st))), r = data[i]; return r ? { r, px: x0(r[o.x]) + x0.bandwidth() / 2 } : null; }, (d, tt) => {
+    ttHead(tt, (o.tlab || lab)(d.r[o.x]));
+    o.series.forEach((s) => { const v = d.r[s.key]; if (v == null) return; ttRow(tt, o.series.length > 1 ? colorOf(s, v, d.r) : null, o.series.length > 1 ? s.label : '', (o.tfmt || fmt)(v)); });
+  });
+}
+function housingChart(box, rows, pace) {
+  const W = Math.max(260, box.clientWidth), H = 280, mb = 22, mt = 8;
+  const data = rows.map(r => ({ ...r, _x: parseP(r.month) })).filter(r => r.month >= '2016-01').sort((a, b) => a._x - b._x);
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const ap = data.filter(r => r.houses_12m != null), st = d3.stack().keys(['houses_12m', 'other_12m'])(ap);
+  const hi = d3.max([d3.max(st[1], d => d[1]) || 0, d3.max(data, d => d.commenced_12m) || 0, d3.max(data, d => d.completed_12m) || 0, pace || 0]);
+  const y = d3.scaleLinear([0, hi], [H - mb, mt]).nice(5), ticks = y.ticks(5), fmt = d3.format(',');
+  const ml = Math.ceil(measure(svg, ticks.map(fmt))) + 10, mr = 10, x = d3.scaleUtc(d3.extent(data, d => d._x), [ml, W - mr]);
+  svg.append('g').selectAll('line').data(ticks).join('line').attr('class', d => d === 0 ? 'zl' : 'gl').attr('x1', ml).attr('x2', W - mr).attr('y1', d => y(d)).attr('y2', d => y(d));
+  svg.append('g').selectAll('text').data(ticks).join('text').attr('class', 'tk').attr('x', ml - 6).attr('y', d => y(d) + 4).attr('text-anchor', 'end').text(fmt);
+  svg.append('g').selectAll('text').data(x.ticks(Math.max(2, Math.floor((W - ml) / 70)))).join('text').attr('class', 'tk').attr('x', d => x(d)).attr('y', H - 4).attr('text-anchor', 'middle').text(d3.utcFormat('%Y'));
+  st.forEach((layer, i) => svg.append('path').datum(layer).attr('fill', col(i)).attr('fill-opacity', .55).attr('d', d3.area().x(d => x(d.data._x)).y0(d => y(d[0])).y1(d => y(d[1]))));
+  [['commenced_12m', 2], ['completed_12m', 3]].forEach(([k, c]) => svg.append('path').datum(data.filter(d => d[k] != null)).attr('class', 'ln').attr('stroke', col(c)).attr('d', d3.line().x(d => x(d._x)).y(d => y(d[k]))));
+  if (pace) { const s0 = parseP('2024-07'), x0 = Math.max(ml, x(s0)); svg.append('line').attr('class', 'rl').attr('x1', x0).attr('x2', W - mr).attr('y1', y(pace)).attr('y2', y(pace)); svg.append('text').attr('class', 'tk').attr('x', W - mr).attr('y', y(pace) + 14).attr('text-anchor', 'end').text('Accord pace'); }
+  electionMark(svg, x, H, mb, mt);
+  const bis = d3.bisector(d => d._x).center;
+  addTooltip(box, svg, W, H, ml, mr, (mx) => { const d = data[bis(data, x.invert(mx))]; return d ? { r: d, px: x(d._x) } : null; }, (d, tt, m) => {
+    ttHead(tt, 'Year to ' + lab(d.r.month));
+    if (d.r.houses_12m != null) { ttRow(tt, col(0), 'Approved houses', fmt(d.r.houses_12m)); ttRow(tt, col(1), 'Approved units and other', fmt(d.r.other_12m)); }
+    if (d.r.commenced_12m != null) ttRow(tt, col(2), 'Commencements', fmt(d.r.commenced_12m));
+    if (d.r.completed_12m != null) ttRow(tt, col(3), 'Completions', fmt(d.r.completed_12m));
+    m.append('line').attr('x1', x(d.r._x)).attr('x2', x(d.r._x)).attr('y1', mt).attr('y2', H - mb).attr('stroke', 'var(--cds-chart-reference)');
+  });
+}
+function donut(box, rows, colorOf) {
+  const W = Math.max(150, Math.min(210, box.clientWidth || 200)), R = W / 2;
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${W}`), g = svg.append('g').attr('transform', `translate(${R},${R})`);
+  const arcs = d3.pie().sort(null).value(d => d.amount_m)(rows), arc = d3.arc().innerRadius(R * 0.58).outerRadius(R - 2).padAngle(0.008);
+  g.selectAll('path').data(arcs).join('path').attr('d', arc).attr('fill', d => colorOf(d.data).c).attr('fill-opacity', d => colorOf(d.data).o);
+  const tt = document.createElement('div'); tt.className = 'tt'; box.append(tt);
+  g.selectAll('path').on('pointermove', (ev, d) => { ttHead(tt, d.data.component); tt.append('$' + d3.format(',.0f')(d.data.amount_m) + 'm, ' + d3.format('.1f')(d.data.share_pct) + '%'); const [mx, my] = d3.pointer(ev, box); tt.style.left = Math.max(0, Math.min(mx + 10, box.clientWidth - tt.offsetWidth)) + 'px'; tt.style.top = Math.max(0, my - 30) + 'px'; tt.style.opacity = 1; }).on('pointerleave', () => { tt.style.opacity = 0; });
+}
+function fillRows(tb, rows, cols, fmts = {}, key, nswCol) {
+  tb.replaceChildren();
+  rows.forEach(r => { const tr = document.createElement('tr'); if (key) tr.dataset.key = key.split(',').map(k => encodeURIComponent(String(r[k]))).join(','); cols.forEach(c => { const td = document.createElement('td'); const v = r[c]; if (fmts[c]) fmts[c](td, v, r); else td.textContent = v == null ? 'n.a.' : String(v); if (c === nswCol) td.className = 'nsw'; tr.append(td); }); tb.append(tr); });
+}
+function hbars(box, items, fmt) {
+  box.classList.remove('dash-skeleton'); box.replaceChildren(); const mx = d3.max(items, d => d.v) || 1;
+  items.forEach(d => { const r = document.createElement('div'); r.className = 'hbar'; const l = document.createElement('span'); l.textContent = d.label; const t = document.createElement('div'); t.className = 't'; const f = document.createElement('div'); f.className = 'f'; f.style.width = Math.max(0, d.v / mx * 100) + '%'; f.style.background = col(0); t.append(f); const n = document.createElement('span'); n.className = 'n'; n.textContent = fmt(d.v); r.append(l, t, n); box.append(r); });
+}
+
+// ---------- drawings ----------
+dash.draw('fx', (el) => {
+  const d = D(el.dataset.source);
+  if (d.status !== 'ok') { el.textContent = '—'; return; }
+  const [k, v] = el.dataset.where.split('='), row = (d.data || []).find(r => String(r[k]) === decodeURIComponent(v));
+  el.textContent = row && row[el.dataset.field] != null ? String(row[el.dataset.field]) : '—';
+});
+function chartDraw(name, deps, draw) {
+  dash.draw(name, (box) => {
+    if (ok(...deps)) { box.classList.remove('dash-skeleton'); box.replaceChildren(); draw(box); }
+    else if (bad(...deps)) failBox(box);
+    else { box.replaceChildren(); box.classList.add('dash-skeleton'); }
+  });
+}
+function tableDraw(name, deps, fill) { dash.draw(name, (tb) => { if (ok(...deps)) fill(tb); else tb.replaceChildren(); }); }
+
+chartDraw('ch-sfd', ['c_sfd_growth'], b => lineChart(b, D('c_sfd_growth').data, { x: 'quarter', from: '2016-03', zero: true, series: [{ key: 'sa_tty', c: 0, label: 'Seasonally adjusted' }, { key: 'trend_tty', c: 1, dash: true, label: 'Trend' }], tfmt: v => pct1(v) + '%' }));
+chartDraw('ch-wages', ['c_wages'], b => lineChart(b, D('c_wages').data, { x: 'quarter', from: '2016-03', zero: true, series: [{ key: 'nsw', c: 0, label: 'NSW' }, { key: 'nsw_private', c: 2, label: 'NSW private' }, { key: 'nsw_public', c: 3, label: 'NSW public' }, { key: 'aus', c: 1, dash: true, label: 'Australia' }, { key: 'real', c: 4, label: 'NSW real wages' }], tfmt: v => pct1(v) + '%' }));
+chartDraw('ch-cpi', ['c_cpi_tty'], b => lineChart(b, D('c_cpi_tty').data, { x: 'quarter', from: '2016-03', series: [{ key: 'sydney', c: 0, label: 'Sydney' }, { key: 'capitals', c: 1, dash: true, label: 'Eight capitals' }], tfmt: v => pct1(v) + '%' }));
+chartDraw('ch-housing', ['c_housing'], b => { const r = D('refs'), pace = r.status === 'ok' ? (r.data.find(x => x.key === 'accord_annual_pace') || {}).value : null; housingChart(b, D('c_housing').data, pace); });
+chartDraw('ch-unemp', ['abs_labour_nsw'], b => lineChart(b, D('abs_labour_nsw').data, { x: 'month', from: '2016-01', series: [{ key: 'unemp_sa', c: 0, label: 'NSW, seasonally adjusted' }, { key: 'unemp_trend', c: 0, dash: true, label: 'NSW, trend' }, { key: 'aus_unemp_sa', c: 1, label: 'Australia' }], tfmt: v => pct1(v) + '%' }));
+chartDraw('ch-emp', ['c_emp_growth'], b => lineChart(b, D('c_emp_growth').data, { x: 'month', from: '2016-01', zero: true, series: [{ key: 'sa_tty', c: 0, label: 'Seasonally adjusted' }, { key: 'trend_tty', c: 1, dash: true, label: 'Trend' }], tfmt: v => pct1(v) + '%' }));
+chartDraw('ch-part', ['abs_labour_nsw'], b => lineChart(b, D('abs_labour_nsw').data, { x: 'month', from: '2016-01', series: [{ key: 'part_sa', c: 0, label: 'Seasonally adjusted' }, { key: 'part_trend', c: 1, dash: true, label: 'Trend' }], tfmt: v => pct1(v) + '%' }));
+chartDraw('ch-spend', ['abs_spending'], b => lineChart(b, D('abs_spending').data, { x: 'month', from: '2023-01', series: [{ key: 'nsw_tty', c: 0, label: 'NSW' }, { key: 'aus_tty', c: 1, dash: true, label: 'Australia' }], tfmt: v => pct1(v) + '%' }));
+chartDraw('ch-cash', ['rba_cash_rate'], b => lineChart(b, D('rba_cash_rate').data, { x: 'date', step: true, zero: true, series: [{ key: 'cash_rate', c: 0, label: 'Cash rate' }], fmt: v => d3.format('.1f')(v), tfmt: v => d3.format('.2f')(v) + '%' }));
+chartDraw('ch-pop', ['c_pop_growth'], b => lineChart(b, D('c_pop_growth').data, { x: 'quarter', from: '2016-03', zero: true, series: [{ key: 'nsw', c: 0, label: 'NSW' }, { key: 'aus', c: 1, dash: true, label: 'Australia' }], tfmt: v => d3.format('.2f')(v) + '%' }));
+chartDraw('ch-interstate', ['abs_interstate'], b => barChart(b, D('abs_interstate').data, { x: 'quarter', from: '2016-Q1', pad: 0.2, series: [{ key: 'net_interstate', c: 0, label: 'Net interstate migration', color: () => 'var(--cds-chart-status-critical)' }], fmt: d3.format(','), tfmt: v => d3.format(',')(v) + ' persons', xlab: q => q.endsWith('Q1') ? q.slice(0, 4) : '', tlab: lab }));
+chartDraw('ch-insolv', ['asic_insolvency'], b => barChart(b, D('asic_insolvency').data, { x: 'month', pad: 0.15, series: [{ key: 'nsw', c: 0, label: 'NSW' }], xlab: m => m.slice(5) === '07' ? m.slice(0, 4) : '', tlab: lab }));
+
+const sfmt = (td, v) => { td.textContent = v == null ? 'n.a.' : (Math.abs(v) >= 1000 ? d3.format(',')(v) : d3.format('.1f')(v)); };
+tableDraw('tb-states', ['c_state_compare'], tb => fillRows(tb, D('c_state_compare').data, ['indicator', 'period', 'NSW', 'VIC', 'QLD', 'SA', 'WA', 'TAS', 'AUS', 'nsw_rank'], { NSW: sfmt, VIC: sfmt, QLD: sfmt, SA: sfmt, WA: sfmt, TAS: sfmt, AUS: sfmt, nsw_rank: (td, v) => { td.textContent = v == null ? 'n.a.' : v + ' of 6'; } }, 'indicator', 'NSW'));
+const olCols = () => { const ol = D('outlook'); return ol.columns && ol.columns.length ? ol.columns : Object.keys(ol.data[0] || {}); };
+dash.draw('th-outlook', (th) => { th.replaceChildren(); if (!ok('outlook')) return; const tr = document.createElement('tr'); olCols().forEach((c, i) => { const h = document.createElement('th'); h.dataset.field = c; h.textContent = c === 'indicator' ? 'Per cent' : c.slice(1, 5) + '-' + c.slice(6, 8) + (i === 1 ? ' outcome' : ' forecast'); tr.append(h); }); th.append(tr); });
+tableDraw('tb-outlook', ['outlook'], tb => fillRows(tb, D('outlook').data, olCols(), {}, 'indicator'));
+
+const gcol = { 'Taxation': 0, 'Grants and subsidies': 1, 'Sale of goods and services': 2, 'Dividends and distributions': 3, 'Fines, fees, royalties and other': 4 };
+const revRows = () => { const go = Object.keys(gcol); return D('c_rev_share').data.slice().sort((a, b) => (go.indexOf(a.group) - go.indexOf(b.group)) || (b.amount_m - a.amount_m)); };
+const revColor = (rows) => r => { const same = rows.filter(x => x.group === r.group), i = same.findIndex(x => x.component === r.component); return { c: col(gcol[r.group] ?? 5), o: Math.max(0.35, 1 - i * 0.22) }; };
+const expColor = (rows) => r => ({ c: col(rows.findIndex(x => x.component === r.component)), o: 1 });
+const legendFill = (tb, rows, cf) => fillRows(tb, rows, ['component', 'amount_m', 'share_pct'], { component: (td, v, r) => { const i = document.createElement('i'), c = cf(r); i.style.background = c.c; i.style.opacity = c.o; td.append(i, v); }, amount_m: (td, v) => { td.textContent = d3.format(',.0f')(v); }, share_pct: (td, v) => { td.textContent = d3.format('.1f')(v); } }, 'component');
+chartDraw('ch-budget', ['budget_aggregates'], b => barChart(b, D('budget_aggregates').data, { x: 'year', h: 280, labels: true, lfmt: v => d3.format('.1f')(v), series: [{ key: 'revenue', c: 0, label: 'Revenue' }, { key: 'expenses', c: 1, label: 'Expense' }, { key: 'budget_result', c: 2, label: 'Budget result', label_values: true, color: (v) => v < 0 ? 'var(--cds-chart-status-critical)' : col(2) }], fmt: v => d3.format(',.0f')(v), tfmt: v => '$' + d3.format(',.1f')(v) + 'b', xlab: y => y, tlab: y => y }));
+chartDraw('ch-rev-donut', ['c_rev_share'], b => { const rr = revRows(); donut(b, rr, revColor(rr)); });
+tableDraw('tb-revenue', ['c_rev_share'], tb => { const rr = revRows(); legendFill(tb, rr, revColor(rr)); });
+chartDraw('ch-exp-donut', ['c_exp_share'], b => { const er = D('c_exp_share').data; donut(b, er, expColor(er)); });
+tableDraw('tb-expenses', ['c_exp_share'], tb => { const er = D('c_exp_share').data; legendFill(tb, er, expColor(er)); });
+tableDraw('tb-tax-summary', ['c_tax_summary'], tb => fillRows(tb, D('c_tax_summary').data, ['tax', 'share_of_tax_text', 'share_of_revenue_pct'], { share_of_revenue_pct: (td, v) => { td.textContent = d3.format('.1f')(v) + '%'; } }, 'tax'));
+tableDraw('tb-top10', ['capital_programs'], tb => fillRows(tb, D('capital_programs').data.filter(r => r.group === 'Top 10').sort((a, b) => a.rank - b.rank), ['project', 'released_info', 'completion'], {}, 'project'));
+tableDraw('tb-other-projects', ['capital_programs'], tb => fillRows(tb, D('capital_programs').data.filter(r => r.group === 'Other').sort((a, b) => a.rank - b.rank), ['project', 'released_info', 'completion'], {}, 'project'));
+const blist = (kind) => (el) => { el.replaceChildren(); if (!ok('exports_fy')) return; D('exports_fy').data.filter(r => r.kind === kind).sort((a, b) => b.value_m - a.value_m).forEach(r => { const s = document.createElement('span'); s.textContent = r.item; el.append(s); }); };
+dash.draw('bl-main', blist('Main export'));
+dash.draw('bl-partners', blist('Partner'));
+chartDraw('ch-debt', ['budget_aggregates'], b => barChart(b, D('budget_aggregates').data, { x: 'year', h: 280, series: [{ key: 'gross_debt_june', c: 0, label: 'Gross debt' }, { key: 'net_debt_june', c: 1, label: 'Net debt' }], fmt: v => d3.format(',.0f')(v), tfmt: v => '$' + d3.format(',.1f')(v) + 'b', xlab: y => 'Jun-' + y.slice(5), tlab: y => 'June 20' + y.slice(5) }));
+chartDraw('ch-hist-result', ['budget_history'], b => barChart(b, D('budget_history').data, { x: 'year', pad: 0.2, series: [{ key: 'budget_result', c: 0, label: 'Budget result', color: (v) => v < 0 ? 'var(--cds-chart-status-critical)' : col(0) }], fmt: v => d3.format('.0f')(v), tfmt: v => '$' + d3.format('.1f')(v) + 'b', xlab: y => (y.endsWith('-01') || y.endsWith('-11') || y.endsWith('-21') || y.endsWith('-31')) ? y.slice(0, 4) : '', tlab: y => y }));
+chartDraw('ch-hist-debt', ['budget_history'], b => lineChart(b, D('budget_history').data.map(r => ({ ...r, yp: (+r.year.slice(0, 4) + 1) + '-06' })), { x: 'yp', zero: true, election: false, series: [{ key: 'net_debt', c: 0, label: 'Net debt' }, { key: 'interest_expense', c: 1, dash: true, label: 'Interest expense' }], fmt: v => d3.format('.0f')(v), tfmt: v => '$' + d3.format('.1f')(v) + 'b' }));
+const txCols = () => { const tx = D('taxation'); return tx.columns && tx.columns.length ? tx.columns : Object.keys(tx.data[0] || {}); };
+dash.draw('th-tax', (th) => { th.replaceChildren(); if (!ok('taxation')) return; const nm = c => /^y\d/.test(c) ? c.slice(1, 5) + '-' + c.slice(6, 8) + ' $m' : ({ tax: 'Tax', growth_pct: 'Growth %', share_of_tax_pct: 'Share of tax %', share_of_revenue_pct: 'Share of revenue %' }[c] || c); const tr = document.createElement('tr'); txCols().forEach(c => { const h = document.createElement('th'); h.dataset.field = c; h.textContent = nm(c); tr.append(h); }); th.append(tr); });
+tableDraw('tb-tax', ['taxation'], tb => { const cols = txCols(), money = (td, v) => { td.textContent = d3.format(',.0f')(v); }, one = (td, v) => { td.textContent = d3.format('.1f')(v); }; fillRows(tb, D('taxation').data, cols, Object.assign(Object.fromEntries(cols.filter(c => /^y\d/.test(c)).map(c => [c, money])), { growth_pct: (td, v) => { td.textContent = (v > 0 ? '+' : '') + d3.format('.1f')(v); }, share_of_tax_pct: one, share_of_revenue_pct: one }), 'tax'); });
+dash.draw('hb-agency', (box) => { if (ok('capital_by_agency')) hbars(box, D('capital_by_agency').data.slice().sort((a, b) => b.four_year_m - a.four_year_m).map(d => ({ label: d.agency, v: d.four_year_m })), v => '$' + d3.format('.1f')(v / 1000) + 'b'); else if (bad('capital_by_agency')) failBox(box); else { box.replaceChildren(); box.classList.add('dash-skeleton'); } });
+tableDraw('tb-credit', ['budget_facts'], tb => fillRows(tb, D('budget_facts').data.filter(r => /^credit_/.test(r.key)), ['label', 'value', 'note'], {}, 'key'));
+
+// News and releases
+const todayISO = () => { const p = new Intl.DateTimeFormat('en-CA', { timeZone: 'Australia/Sydney', year: 'numeric', month: '2-digit', day: '2-digit' }).format(new Date()); return p; };
+const wd = d => { const x = parseP(d); return x ? d3.utcFormat('%a %-d %b %Y')(x) : d; };
+tableDraw('tb-releases', ['releases'], tb => { const t = todayISO(), rows = D('releases').data.filter(r => r.date >= t).sort((a, b) => a.date < b.date ? -1 : a.date > b.date ? 1 : 0); fillRows(tb, rows, ['date', 'time', 'release', 'reference_period', 'measure', 'publisher'], { date: (td, v) => { td.textContent = wd(v); }, time: (td, v) => { td.textContent = v || 'Not stated'; } }, 'date,release'); });
+const newsList = (week) => (ul) => {
+  ul.replaceChildren(); if (!ok('news')) return;
+  D('news').data.filter(r => r.week === week).sort((a, b) => a.date < b.date ? 1 : -1).forEach(r => {
+    const li = document.createElement('li'), d = document.createElement('span'); d.className = 'nd'; const x = parseP(r.date); d.textContent = x ? d3.utcFormat('%-d %b')(x) : r.date;
+    const body = document.createElement('div'), a = document.createElement('a'); a.textContent = r.title; if (/^https:\/\//.test(r.url || '')) { a.href = r.url; a.target = '_blank'; a.rel = 'noopener noreferrer'; }
+    const s = document.createElement('span'); s.className = 'ns'; s.textContent = r.source; body.append(a, s); li.append(d, body); ul.append(li);
+  });
+};
+dash.draw('news-this', newsList('This week'));
+dash.draw('news-last', newsList('Last week'));
+dash.draw('hb-themes', (box) => { if (ok('news_themes')) hbars(box, D('news_themes').data.map(d => ({ label: d.theme, v: d.headlines })), v => d3.format(',')(v)); else if (bad('news_themes')) failBox(box); else { box.replaceChildren(); box.classList.add('dash-skeleton'); } });
+
+// ---------- tile tones ----------
+dash.onData(() => {
+  const f = D('c_fast');
+  document.querySelectorAll('.tile[data-id]').forEach(t => { const r = f.status === 'ok' ? f.data.find(x => x.id === t.dataset.id) : null, tone = r ? r.tone : 'neutral'; t.classList.toggle('tone-good', tone === 'good'); t.classList.toggle('tone-bad', tone === 'bad'); });
+});
+
+// ---------- tabs ----------
+const PAGES = ['economy', 'budget', 'news', 'notes'];
+function show(id, push = true) {
+  document.querySelectorAll('.td-tab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === id)));
+  document.querySelectorAll('.td-page').forEach(p => { p.hidden = p.id !== id; });
+  if (push) dash.setLink(id);
+}
+document.querySelectorAll('.td-tab').forEach(t => t.addEventListener('click', () => show(t.dataset.tab)));
+const named = location.hash.slice(1);
+if (PAGES.includes(named)) show(named, false);
+</script>
+
+  <footer class="site-foot">Built from official statistics: the Australian Bureau of Statistics, the Reserve Bank of Australia, ASIC, NSW Budget papers, the NAB Monthly Business Survey and the Cotality Home Value Index. Each figure is traced to its source under Sources and notes, where every data file can be downloaded. Not affiliated with NSW Treasury or any data publisher.</footer>
+</div>
+
+<script>
+const fmtAt = (s) => { const d = new Date(s); return isNaN(d) ? s : d.toLocaleString('en-AU', { timeZone: 'Australia/Sydney', day: 'numeric', month: 'short', year: 'numeric', hour: 'numeric', minute: '2-digit' }); };
+dash.draw('asof', (el) => { const m = dash.manifest(); el.textContent = m && m.generated ? 'at ' + fmtAt(m.generated) + ' Sydney time' : '—'; });
+dash.draw('tb-sources', (tb) => {
+  const m = dash.manifest(); tb.replaceChildren(); if (!m) return;
+  Object.entries(m.datasets).sort((a, b) => a[1].title.localeCompare(b[1].title)).forEach(([id, d]) => {
+    const tr = document.createElement('tr');
+    const t1 = document.createElement('td'); t1.textContent = d.title;
+    const t2 = document.createElement('td'); t2.textContent = d.description || '';
+    const t3 = document.createElement('td'); t3.textContent = d.updated ? fmtAt(d.updated) : 'n.a.';
+    const t4 = document.createElement('td'); const a = document.createElement('a'); a.href = 'data/' + id + '.json'; a.textContent = id + '.json'; t4.append(a);
+    tr.append(t1, t2, t3, t4); tb.append(tr);
+  });
+});
+</script>
+</body>
+</html>
