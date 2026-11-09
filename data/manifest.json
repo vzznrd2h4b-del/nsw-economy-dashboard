@@ -1,245 +1,285 @@
 {
- "generated": "2026-11-09T01:09:41Z",
+ "generated": "2026-11-09T01:45:14Z",
  "datasets": {
   "abs_approvals_nsw": {
    "title": "NSW dwelling approvals by type",
    "description": "ABS Building Approvals (dataflow BA_GCCSA): NSW dwelling units approved, houses and dwellings excluding houses, original, monthly from 2015.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "fef39d0a29ebe4fcf0803e774c1f19dc"
   },
   "abs_approvals_regions": {
    "title": "Approvals, Sydney vs regions",
    "description": "ABS Building Approvals (dataflow BA_GCCSA): total dwelling units approved in Greater Sydney and Rest of NSW, original, monthly.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "41a1d5b8494fa59cf2f2f0a41ecdacf5"
   },
   "abs_approvals_states": {
    "title": "Dwelling approvals by state",
    "description": "ABS Building Approvals (dataflow BA_GCCSA): total dwelling units approved by state and Australia, original, monthly.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "23656b3127e323a13169ff0bb085c712"
   },
   "abs_completions": {
    "title": "NSW dwelling commencements, completions",
    "description": "ABS Building Activity (dataflow BUILDING_ACTIVITY): NSW dwelling units commenced and completed, total residential, original, quarterly from 2015.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "2bcf98ea0c569d66ee61d60bb62f5ee3"
   },
   "abs_completions_states": {
    "title": "Dwelling completions by state",
    "description": "ABS Building Activity (dataflow BUILDING_ACTIVITY): dwelling units completed, total residential, original, by state and Australia, latest eight quarters.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "246d3eeb2ee13bd39bf3abdb3310a51b"
   },
   "abs_cpi_monthly": {
    "title": "CPI growth, monthly",
    "description": "ABS monthly Consumer Price Index (dataflow CPI): all groups, through-the-year per cent change, Sydney and eight capitals.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "8443a6e62947ab90c28c3f403ed5f87c"
   },
   "abs_cpi_quarterly": {
    "title": "CPI index, quarterly",
    "description": "ABS Consumer Price Index (dataflow CPI): all groups index, Sydney and weighted average of eight capital cities, original, quarterly from 2014.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "76c7c2063660baa305bad5f133f1be03"
   },
   "abs_exports": {
    "title": "NSW merchandise exports",
    "description": "ABS International Trade (dataflow MERCH_EXP): NSW goods exports, 12-month sums in $m, total and top destinations and SITC commodity divisions.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "89f506d4d62e94eba8bb6b871d169b05"
   },
   "abs_gdp": {
    "title": "Australian GDP growth",
    "description": "ABS National Accounts (dataflow ANA_AGG): gross domestic product and GDP per capita, chain volume, seasonally adjusted, per cent change on the previous quarter, from 2015.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "2e7ed1c0532f1c59720b2e9cd910c7f8"
   },
   "abs_gsp_states": {
    "title": "Gross state product by state",
    "description": "ABS Australian National Accounts: State Accounts: real gross state product growth and GSP per capita growth by state and territory, latest financial year (2024-25, released 20 November 2025).",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "efabc7e67be990c1f273f38cef5205ab"
   },
   "abs_interstate": {
    "title": "NSW interstate migration",
    "description": "ABS National, state and territory population (dataflow ERP_COMP_Q): NSW net interstate migration (persons), interstate arrivals and departures ('000), quarterly from 2015.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "a6fb048ce5354e8676dc5ddf27b8c6ab"
   },
   "abs_labour_nsw": {
    "title": "NSW labour force, monthly",
    "description": "ABS Labour Force (dataflow LF): NSW unemployment rate, participation rate and employed persons ('000), seasonally adjusted and trend, with the Australian unemployment rate (seasonally adjusted), monthly from January 2015.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "b868c1dbb644df178ebee94ac3acebc5"
   },
   "abs_labour_states": {
    "title": "Labour force by state",
    "description": "ABS Labour Force (dataflow LF): unemployment rate and employed persons by state and Australia, seasonally adjusted, latest 14 months.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "436f31c4c3d9b2331e40eb75635e5cc8"
   },
   "abs_population": {
    "title": "Estimated resident population",
    "description": "ABS National, state and territory population (dataflow ERP_Q): estimated resident population, persons, quarterly. NSW from 2014, Australia from 2018, other states latest six quarters.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "ad1a0b9239c8673130e525ec94f1bbdc"
   },
   "abs_sfd_nsw": {
    "title": "NSW state final demand",
    "description": "ABS National Accounts (dataflow ANA_SFD): NSW state final demand, chain volume measures $m, seasonally adjusted and trend, quarterly from 2015.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "e5077a1df1c680e9236a688c97761be3"
   },
   "abs_sfd_states": {
    "title": "SFD and investment by state",
    "description": "ABS National Accounts (dataflow ANA_SFD): state final demand and private business investment, chain volume $m, seasonally adjusted, latest eight quarters.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "4081e7519521f442c1fa95d164db7aba"
   },
   "abs_spending": {
    "title": "Household spending growth",
    "description": "ABS Monthly Household Spending Indicator (dataflow HSI_M): total household spending, current price, seasonally adjusted, through-the-year per cent change, NSW and Australia.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "0fc3826332261971fc5255d081b255ba"
   },
   "abs_spending_states": {
    "title": "Household spending by state",
    "description": "ABS Monthly Household Spending Indicator (dataflow HSI_M): through-the-year per cent change by state, latest four months.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "4a5f72ed06ba043d45c84cc51443ff07"
   },
   "abs_wpi": {
    "title": "Wage price index growth",
    "description": "ABS Wage Price Index (dataflow WPI): total hourly rates of pay excluding bonuses, through-the-year per cent change, original: NSW all sectors, NSW private, NSW public and Australia, quarterly from 2015.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "9456526d802a0ce3668abb8877968054"
   },
   "abs_wpi_states": {
    "title": "Wage growth by state",
    "description": "ABS Wage Price Index (dataflow WPI): through-the-year per cent change, all sectors, by state and Australia, latest eight quarters.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "e14b8d0daeec164d3b7e17f67ceca571"
   },
   "asic_insolvency": {
    "title": "ASIC company insolvencies",
    "description": "ASIC insolvency statistics Series 1, Table 1.3: companies entering external administration for the first time, NSW and Australia, by month.",
    "updated": "2026-11-02T22:59:41Z",
-   "schedule": "Checked each weekday at 12:23pm Sydney time through the Claude desktop app on your computer; ASIC publishes monthly."
+   "schedule": "Checked each weekday at 12:23pm Sydney time through the Claude desktop app on your computer; ASIC publishes monthly.",
+   "blob": "b97ea7704ab79766a7283a423b1d55f4"
   },
   "bond10": {
    "title": "10-year bond yield, monthly",
    "description": "RBA table F2.1: 10-year Australian Government bond yield, monthly average, read through the open-source NSW Economic Dashboard pipeline on GitHub.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "f583d9cda2731a450210ac4358e6b8cb"
   },
   "budget_aggregates": {
    "title": "Budget aggregates, 2026-27",
    "description": "NSW Budget 2026-27, general government sector: revenue, expenses, budget result, taxation, interest, capital expenditure ($b), net and gross debt and superannuation provision at 30 June. BP1 Tables 1.2, 6.1, A.1, A.2 and budgeted financial statements open data.",
    "updated": "2026-10-23T04:45:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "6c490712577cb81a8a2e8ca401706583"
   },
   "budget_facts": {
    "title": "Ratings and fiscal facts",
    "description": "Credit ratings (Moody's, Fitch, S&P), infrastructure program totals, transfer duty revision, first home buyer duty assistance and labour productivity figures, each row citing its source.",
    "updated": "2026-10-23T05:25:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "07297cde112ff5a51e8be3754147a3ec"
   },
   "budget_history": {
    "title": "Fiscal history since 2000-01",
    "description": "NSW general government revenue, expenses, budget result, net debt and interest expense, $b, 2000-01 to 2029-30. BP1 2026-27 Tables E.6 and E.7.",
    "updated": "2026-10-23T04:45:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "a7429117fe4225021e04cfd865f9d2f2"
   },
   "capital_by_agency": {
    "title": "Capital program by agency",
    "description": "NFPS capital spending by agency group, $m, 2026-27 and four-year total to 2029-30. BP3 Table 1.3.",
    "updated": "2026-10-23T04:45:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "959619c727a65ebc685109221da323c3"
   },
   "capital_programs": {
    "title": "Top capital programs",
    "description": "Largest NSW capital programs by value with publicly released cost information and completion dates, plus other major projects. BP3 2026-27 Chapter 2 key project tables, Box 2.18 and Chapter 4 agency tables; value_b ranks by ETC where published, otherwise expenditure to 30 June 2026 plus the four-year program.",
    "updated": "2026-10-23T05:25:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "b4afe0d05d4849ac8db2f4057e8ec1dc"
   },
   "expense_mix": {
    "title": "Expenses by type, 2026-27",
    "description": "General government expenses by type, $m, 2026-27 Budget. BP1 Table A.1 (budgeted financial statements).",
    "updated": "2026-10-23T04:45:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "94aeff8d69c644d2c5c2bfb792b1f3ca"
   },
   "exports_fy": {
    "title": "NSW exports, 2024-25",
    "description": "NSW goods exports (ABS MERCH_EXP, state of origin, July 2024 to June 2025) by main commodity and top five partners, and services exports by state (ABS International Trade: Supplementary Information, Financial Year 2024-25, released 17 December 2025).",
    "updated": "2026-10-23T05:25:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "c9357bbe356ded10701f028b1f2244a6"
   },
   "nab_survey": {
    "title": "NAB business survey",
    "description": "NAB Monthly Business Survey: national business conditions and confidence (net balance, seasonally adjusted) and capacity utilisation, latest month.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "484f4e4e0a9fa030e0f405b8df791bbc"
   },
   "news": {
    "title": "NSW economy headlines",
    "description": "Google News headlines on the NSW economy, budget, housing and cost of living for the past two weeks, collected by the open-source NSW Economic Dashboard pipeline on GitHub.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked daily; the source pipeline updates headlines each Monday."
+   "schedule": "Checked daily; the source pipeline updates headlines each Monday.",
+   "blob": "3de2e573edd78ac241c1585aeb077f21"
   },
   "news_themes": {
    "title": "Headline themes",
    "description": "Number of NSW economy headlines by theme over the past two weeks, from the same open-source pipeline.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked daily; the source pipeline updates headlines each Monday."
+   "schedule": "Checked daily; the source pipeline updates headlines each Monday.",
+   "blob": "7a4a792c7ddd6e8765045fc919f1b226"
   },
   "outlook": {
    "title": "Economic outlook, 2026-27 Budget",
    "description": "NSW economic performance and outlook: 2024-25 outcomes and Treasury forecasts to 2029-30. BP1 2026-27 Table 2.1.",
    "updated": "2026-10-23T04:45:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "18cb4b50a8826eb0f8833dbbb47ddd15"
   },
   "property_sydney": {
    "title": "Sydney median home values",
    "description": "Cotality Home Value Index: Sydney median values for houses, units and all dwellings, with monthly and annual change.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "8a63a898d310cf59ae1e5b45a367793f"
   },
   "rba_cash_rate": {
    "title": "RBA cash rate target",
    "description": "Reserve Bank of Australia cash rate target at each change since February 2019, from rba.gov.au/statistics/cash-rate.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "37c0c483e7c4b6e9b412ba31737e75ce"
   },
   "rba_fx": {
    "title": "Australian dollar, daily",
    "description": "RBA exchange rates: US dollars per Australian dollar and the trade-weighted index at 4pm Sydney time, each trading day from 4 November 2026.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "d96735253acbcbe3b67219eda1da9505"
   },
   "refs": {
    "title": "Reference dates and targets",
    "description": "Dates and targets drawn on charts: the 25 March 2023 NSW election, and the NSW National Housing Accord target of 377,000 homes over five years from 1 July 2024 (75,400 a year).",
    "updated": "2026-11-08T23:20:06Z",
-   "schedule": ""
+   "schedule": "",
+   "blob": "5abff81810b50fdf4e258748f2b8234b"
   },
   "releases": {
    "title": "Upcoming data releases",
    "description": "Scheduled release dates for the figures on this dashboard, from the ABS release calendar, the RBA Monetary Policy Board schedule, and the NAB and Cotality release patterns.",
    "updated": "2026-11-09T00:59:37Z",
-   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures."
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "d576f2f040c306ca8592a4e2ad0a271b"
   },
   "revenue_mix": {
    "title": "Revenue by source, 2026-27",
    "description": "General government revenue by source, $m, 2026-27 Budget. BP1 Tables 4.1 and 4.5 (other grants combine other Australian Government payments and other grants).",
    "updated": "2026-10-23T04:45:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "1566e804cdc7a2776825f75c3d92bb7b"
   },
   "taxation": {
    "title": "Taxation by type, 2026-27",
    "description": "General government taxation revenue by tax, $m, 2025-26 revised and 2026-27 budget, with shares of taxation and total revenue. BP1 Table 4.4.",
    "updated": "2026-10-23T04:45:00Z",
-   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one."
+   "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
+   "blob": "8d9cc63801f1d9801ae9cd550a112d14"
   }
  }
 }

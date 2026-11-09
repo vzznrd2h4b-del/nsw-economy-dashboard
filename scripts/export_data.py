@@ -53,6 +53,7 @@ def main(docs_dir, files_dir, site_dir):
                 "description": d.get("description", ""),
                 "updated": (d.get("updated") or {}).get("at"),
                 "schedule": d.get("schedule", ""),
+                "blob": ((d.get("source") or {}).get("url", "").split("/_blob/") + [None])[1],
             }
             for ds, d in sorted(docs.items())
         },
