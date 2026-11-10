@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-10T06:21:08Z",
+ "generated": "2026-11-10T06:54:12Z",
  "datasets": {
   "abs_approvals_nsw": {
    "title": "NSW dwelling approvals by type",
@@ -203,6 +203,27 @@
    "updated": "2026-10-23T05:25:00Z",
    "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
    "blob": "c9357bbe356ded10701f028b1f2244a6"
+  },
+  "jur_budget": {
+   "title": "Jurisdictions compared, 2026-27 budgets",
+   "description": "Commonwealth, state and territory 2026-27 Budget figures ($m): revenue, taxation, expenses, net operating balance, net and gross debt at 30 June 2027, infrastructure spending and GSP or GDP, general government sector unless noted, each with its source table and caveats.",
+   "updated": "2026-11-10T00:00:00Z",
+   "schedule": "Fixed to the 2026-27 budgets; rebuilt when governments publish new budgets or mid-year updates. The daily refresh checks for them.",
+   "blob": "ad3f8d3fd7b9525c785a728fa79806e9"
+  },
+  "jur_growth": {
+   "title": "Tax and expense growth since 2022-23",
+   "description": "General government taxation and expenses ($m) for each jurisdiction: 2022-23 actual and 2026-27 Budget estimate, with sources and caveats.",
+   "updated": "2026-11-10T00:00:00Z",
+   "schedule": "Fixed to the 2026-27 budgets; rebuilt when governments publish new budgets. The daily refresh checks for them.",
+   "blob": "5b42cd9e9da64d11789b78112e6d8a0c"
+  },
+  "jur_ratings": {
+   "title": "Credit ratings by jurisdiction",
+   "description": "S&P Global, Moody's and Fitch long-term ratings and outlooks for the Commonwealth, states and territories, with the latest rating actions.",
+   "updated": "2026-11-10T00:00:00Z",
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when an agency announces a rating action.",
+   "blob": "e45274c7c1b7a8f98863bbcfada02eaa"
   },
   "nab_survey": {
    "title": "NAB business survey",

@@ -100,6 +100,11 @@ body { font-family: var(--font-anthropic-sans); -webkit-font-smoothing: antialia
 .failed { display: flex; align-items: center; justify-content: center; gap: .4rem; min-height: inherit; color: var(--color-fg-muted); font-size: var(--cds-font-size-caption); }
 .failed::before { content: ""; width: .375rem; height: .375rem; border-radius: 50%; background: var(--color-bad); }
 .tbl-wrap { overflow-x: auto; }
+table.tb tr.nsw-row td { background: color-mix(in srgb, var(--color-fg) 6%, transparent); font-weight: var(--cds-font-weight-medium); }
+.jur-metric { font: inherit; font-size: var(--cds-font-size-caption); color: var(--color-fg); background: var(--color-panel); border: 1px solid var(--color-border-line); border-radius: var(--cds-radius); padding: 4px 8px; margin-bottom: var(--cds-gap-sm); }
+#tb-jur-ratings td:last-child { min-width: 16rem; }
+.jur-notes summary { cursor: pointer; font-weight: var(--cds-font-weight-medium); }
+.jur-notes h3 { margin-top: var(--cds-gap-md); }
 table.tb { width: 100%; border-collapse: collapse; font-size: var(--cds-font-size-caption); font-variant-numeric: tabular-nums; }
 table.tb th, table.tb td { padding: 6px 8px; text-align: right; border-bottom: 1px solid var(--color-border-line); white-space: nowrap; }
 table.tb th { font-weight: var(--cds-font-weight-medium); color: var(--color-fg-muted); white-space: normal; vertical-align: bottom; }
@@ -316,6 +321,69 @@ table.tb.wrap td:nth-child(2), table.tb.wrap th:nth-child(2) { text-align: left;
       <div class="card" id="card-tax-detail"><h3>Taxation by tax, detail</h3><p class="note">Budget Paper No. 1, Table 4.4</p><div class="tbl-wrap"><table class="tb" id="tb-tax" data-source="taxation" data-row-key="tax"><thead data-draw="th-tax"></thead><tbody data-draw="tb-tax"></tbody></table></div></div>
       <div class="card" id="card-credit"><h3>Credit ratings</h3><p class="note">State of New South Wales</p><div class="tbl-wrap"><table class="tb" id="tb-credit" data-source="budget_facts" data-row-key="key"><thead><tr><th data-field="label">Agency</th><th data-field="value">Rating</th><th data-field="note">Latest action</th></tr></thead><tbody data-draw="tb-credit"></tbody></table></div></div>
     </div>
+
+    <h2 class="td-h2" id="jurisdictions">Australian jurisdictions compared</h2>
+    <p class="td-lede">General government sector, 2026-27 budget year, from each government's 2026-27 Budget. Debt is at 30 June 2027. States and territories are measured against gross state product (GSP), the Commonwealth against gross domestic product (GDP). † marks a figure with a caveat, listed under Notes on the comparison.</p>
+
+    <div class="card" id="card-jur-dollars"><h3>Key budget metrics, $ billion</h3><p class="note">Budget result is the net operating balance. Infrastructure is each government's 2026-27 capital spending on the measure shown in the notes.</p>
+      <div class="tbl-wrap"><table class="tb" id="tb-jur-dollars" data-source="c_jur" data-row-key="jurisdiction"><thead><tr><th data-field="jurisdiction">Jurisdiction</th><th data-field="revenue_b">Revenue</th><th data-field="tax_b">Taxation</th><th data-field="expenses_b">Expenses</th><th data-field="nob_b">Budget result</th><th data-field="net_debt_b">Net debt</th><th data-field="gross_debt_b">Gross debt</th><th data-field="infra_b">Infrastructure</th><th data-field="gsp_b">GSP or GDP</th></tr></thead><tbody data-draw="tb-jur-dollars"></tbody></table></div>
+    </div>
+
+    <div class="card" id="card-jur-pct" style="margin-top: var(--cds-gap-md)"><h3>Key budget metrics, per cent of GSP or GDP</h3><p class="note">Commonwealth ratios are as published in Budget Paper No. 1, Statement 11. State and territory ratios divide each figure by that jurisdiction's 2026-27 GSP (see Notes for how each GSP figure was obtained).</p>
+      <div class="tbl-wrap"><table class="tb" id="tb-jur-pct" data-source="c_jur" data-row-key="jurisdiction"><thead><tr><th data-field="jurisdiction">Jurisdiction</th><th data-field="revenue_pct_text">Revenue</th><th data-field="tax_pct_text">Taxation</th><th data-field="expenses_pct_text">Expenses</th><th data-field="nob_pct_text">Budget result</th><th data-field="net_debt_pct_text">Net debt</th><th data-field="gross_debt_pct_text">Gross debt</th><th data-field="infra_pct_text">Infrastructure</th></tr></thead><tbody data-draw="tb-jur-pct"></tbody></table></div>
+    </div>
+
+    <div class="grid" style="margin-top: var(--cds-gap-md)">
+      <div class="card" id="card-jur-chart"><h3>States and territories, per cent of GSP</h3><p class="note">NSW highlighted. The Commonwealth is left off the chart because its ratios are on a different scale.</p>
+        <select class="dash-select jur-metric" aria-label="Measure to chart">
+          <option value="expenses">Expenses</option>
+          <option value="revenue">Revenue</option>
+          <option value="tax">Taxation</option>
+          <option value="nob">Budget result</option>
+          <option value="net_debt" selected>Net debt</option>
+          <option value="gross_debt">Gross debt</option>
+          <option value="infra">Infrastructure</option>
+        </select>
+        <div class="chart dash-skeleton" id="ch-jur" data-draw="ch-jur" data-source="c_jur"></div>
+      </div>
+      <div class="card" id="card-jur-rank"><h3>Where NSW sits</h3><p class="note">NSW's position among the eight states and territories with a figure, ranked from the highest share of GSP (1st) to the lowest.</p>
+        <div class="tbl-wrap"><table class="tb" id="tb-jur-rank" data-source="c_jur_rank" data-row-key="measure"><thead><tr><th data-field="measure">Measure</th><th data-field="nsw_text">NSW</th><th data-field="rank_text">NSW position</th><th data-field="highest_text">Highest</th><th data-field="lowest_text">Lowest</th></tr></thead><tbody data-draw="tb-jur-rank"></tbody></table></div>
+      </div>
+    </div>
+
+    <div class="card" id="card-jur-ratings" style="margin-top: var(--cds-gap-md)"><h3>Credit ratings</h3><p class="note">Long-term ratings and outlooks as at November 2026: the QTC Investor Book (30 June 2026, slide 7) updated for later rating actions shown in the notes column.</p>
+      <div class="tbl-wrap"><table class="tb left" id="tb-jur-ratings" data-source="jur_ratings" data-row-key="jurisdiction"><thead><tr><th data-field="jurisdiction">Jurisdiction</th><th data-field="sp">S&amp;P Global</th><th data-field="moodys">Moody's</th><th data-field="fitch">Fitch</th><th data-field="note">Recent actions</th></tr></thead><tbody data-draw="tb-jur-ratings"></tbody></table></div>
+    </div>
+
+    <h2 class="td-h2" id="jur-growth">Growth in taxation and expenses since 2022-23</h2>
+    <p class="td-lede">Growth from the 2022-23 actual to the 2026-27 Budget estimate, as a percentage of each jurisdiction's own 2022-23 figure, so budgets of different sizes compare directly. Average annual growth is over the four years.</p>
+    <div class="card" id="card-jur-growth-chart"><h3>Cumulative growth, 2022-23 to 2026-27</h3><p class="note">Per cent. Jurisdictions without a complete series are left off.</p>
+        <div class="chart tall dash-skeleton" id="ch-jur-growth" data-draw="ch-jur-growth" data-source="c_jur_growth"></div>
+        <div class="legend"><span><i class="sw blk" data-c="0"></i>Taxation</span><span><i class="sw blk" data-c="1"></i>Expenses</span></div>
+    </div>
+    <div class="card" id="card-jur-growth-tbl" style="margin-top: var(--cds-gap-md)"><h3>Taxation and expenses, $ billion and growth</h3><p class="note">Gap is taxation growth less expense growth, in percentage points: a positive gap means tax has grown faster than spending.</p>
+        <div class="tbl-wrap"><table class="tb" id="tb-jur-growth" data-source="c_jur_growth" data-row-key="jurisdiction"><thead><tr><th data-field="jurisdiction">Jurisdiction</th><th data-field="tax_2223_b">Tax 2022-23</th><th data-field="tax_2627_b">Tax 2026-27</th><th data-field="tax_growth_text">Tax growth</th><th data-field="tax_cagr_text">Per year</th><th data-field="exp_2223_b">Expenses 2022-23</th><th data-field="exp_2627_b">Expenses 2026-27</th><th data-field="exp_growth_text">Expense growth</th><th data-field="exp_cagr_text">Per year</th><th data-field="gap_text">Gap</th></tr></thead><tbody data-draw="tb-jur-growth"></tbody></table></div>
+    </div>
+
+    <details class="card jur-notes" id="jur-notes" style="margin-top: var(--cds-gap-md)">
+      <summary>Notes on the comparison and sources</summary>
+      <h3>Notes</h3>
+      <ul class="notes" data-draw="jur-notes" data-source="jur_budget jur_growth"></ul>
+      <h3>Sources</h3>
+      <ul class="notes">
+        <li>Commonwealth: <a href="https://budget.gov.au/content/bp1/download/bp1_bs-11.pdf">2026-27 Budget Paper No. 1, Statement 11</a>, Tables 11.4 (p. 433), 11.5 (p. 435), 11.6 (p. 437) and 11.8 (p. 439), 12 May 2026; <a href="https://budget.gov.au/content/bp1/download/bp1_bs-1.pdf">Statement 1</a>, Table 1.2 (p. 8).</li>
+        <li>NSW: <a href="https://files.parliament.nsw.gov.au/fileapi/ParlFiles/GetArtifact/2026-27%20Budget%20Paper%20No.01%20-%20Budget%20Statement.pdf?serverRelativeUrl=%2Ftp%2Ffiles%2F211331%2F2026-27+Budget+Paper+No.01+-+Budget+Statement.pdf">2026-27 Budget Paper No. 1</a>, Table 1.2 (p. 1-6), Table 4.4 and Table 6.1 (p. 6-4), 23 June 2026; Budget Paper No. 3, Table 1.3.</li>
+        <li>Victoria: <a href="https://s3.ap-southeast-2.amazonaws.com/vicbudgetfiles2026.27vicbudget/2026-27+State+Budget+-+Strategy+and+Outlook.pdf">2026-27 Budget Paper No. 2</a>, Tables 4.1 (p. 47) and 4.2 (p. 48); <a href="https://s3.ap-southeast-2.amazonaws.com/vicbudgetfiles2026.27vicbudget/2026-27+State+Budget+-+Statement+of+Finances.pdf">Budget Paper No. 5</a>, balance sheet (p. 10), cash flow statement (p. 11) and Note 1.1 (p. 19), 5 May 2026.</li>
+        <li>Queensland: <a href="https://budget.qld.gov.au/files/2026-27-budget-bp2-budget-strategy-outlook.pdf">2026-27 Budget Paper No. 2</a>, Table 2.1 (p. 38), Table 3.1 (p. 48) and Appendix D, 23 June 2026; <a href="https://www.qtc.com.au/wp-content/uploads/2026/08/QTC-Investor-Book-as-at-30-June-2026.pdf">QTC Investor Book, 30 June 2026</a>, slides 7 and 22.</li>
+        <li>Western Australia: <a href="https://www.ourstatebudget.wa.gov.au/2026-27/budget-papers/bp3/2026-27-wa-state-budget-bp3.pdf">2026-27 Budget Paper No. 3</a>, Key Budget Aggregates Table 2 (p. 5) and Chapter 3 Table 1 (p. 36), 7 May 2026; <a href="https://www.pwc.com.au/tax/tax-alerts/2026-27-western-australian-budget.html">PwC, 2026-27 Western Australian Budget</a> (taxation growth).</li>
+        <li>South Australia: <a href="https://www.treasury.sa.gov.au/__data/assets/pdf_file/0006/1419036/2026-27-Budget-Statement.pdf">2026-27 Budget Statement (Budget Paper 3)</a>, Tables 1.3 (p. 9) and 1.4 (p. 11), Chapter 2 (p. 29), 5 June 2026; <a href="https://www.treasury.sa.gov.au/budget/current-budget/22-23-state-budget/Final-Budget-Outcome-2022-23.pdf">Final Budget Outcome 2022-23</a>, Table A.1 (p. 16).</li>
+        <li>Tasmania: <a href="https://www.treasury.tas.gov.au/Documents/2026-27%20Budget%20Paper%20No.%201,%20Budget%20Strategy%20and%20Estimates.PDF">2026-27 Budget Paper No. 1</a>, Table 1.1 (p. 9), Chart 1.1 (p. 10) and Table 8.3 (p. 187), 21 May 2026; <a href="https://audit-tas-gov-au.assets.ionatahosting.net/uploads/AGR-2022-23-Vol-1-full-report.pdf">Auditor-General's Report 2022-23, Volume 1</a>, pp. 41-43.</li>
+        <li>ACT: <a href="https://www.treasury.act.gov.au/__data/assets/word_doc/0005/3080660/2026-27-Budget-Outlook.docx">2026-27 Budget Outlook</a>, Table 3.1.2, 10 June 2026; <a href="https://www.treasury.act.gov.au/__data/assets/pdf_file/0008/3080672/2026-27-Budget-Medium-Term-Projections.pdf">Medium Term Projections</a>, Table 1 (p. 6); <a href="https://www.treasury.act.gov.au/__data/assets/pdf_file/0003/2337348/2022-23-Uniform-Presentation-Framework-Tables.pdf">2022-23 Uniform Presentation Framework Tables</a>, Tables 1 and 5 (pp. 2-3).</li>
+        <li>Northern Territory: 2026-27 Budget Paper No. 2, Tables 1.1, 2.6 and 2.9, 5 May 2026, as published on the <a href="https://budget.nt.gov.au/papers/guide/territorys-budget-position">NT Budget guide</a>; <a href="https://www.grantthornton.com.au/insights/client-alerts/nt-budget-2026-27/">Grant Thornton NT Budget summary</a> (infrastructure program).</li>
+        <li>Credit ratings: <a href="https://www.qtc.com.au/wp-content/uploads/2026/08/QTC-Investor-Book-as-at-30-June-2026.pdf">QTC Investor Book, 30 June 2026</a>, slide 7; <a href="https://www.tcv.vic.gov.au/tcv-bonds/credit-ratings">TCV credit ratings</a>; <a href="https://www.nsw.gov.au/ministerial-releases/fitch-affirms-nsw-triple-a-credit-rating-0">NSW Government, 9 Sep 2026</a>; <a href="https://www.nsw.gov.au/ministerial-releases/sp-global-upgrades-new-south-wales-outlook">NSW Government, 11 Sep 2026</a>; <a href="https://statements.qld.gov.au/statements/106043">Queensland Treasurer, 11 Sep 2026</a>; <a href="https://www.indailysa.com.au/news/just-in/2026/08/12/kouts-hails-latest-sa-credit-rating">InDaily, 12 Aug 2026</a>; <a href="https://pulsetasmania.com.au/news/tasmania-hit-with-sp-credit-downgrade-days-after-moodys-cut">Pulse Tasmania, 27 Nov 2025</a>; <a href="https://ministers.treasury.gov.au/ministers/jim-chalmers-2022/media-releases/another-ratings-agency-affirms-australias-aaa-credit">Commonwealth Treasurer, 9 Oct 2026</a>.</li>
+        <li>GSP: ABS Australian National Accounts: State Accounts, 2024-25 (20 November 2025) for 2024-25 growth; DFAT state fact sheets for 2023-24 levels (<a href="https://www.dfat.gov.au/sites/default/files/sa-cef.pdf">SA</a>, <a href="https://www.dfat.gov.au/sites/default/files/nt-cef.pdf">NT</a>).</li>
+      </ul>
+    </details>
   </section>
 
   <section class="td-page" id="news" hidden>
@@ -760,6 +828,125 @@ const newsList = (week) => (ul) => {
 dash.draw('news-this', newsList('This week'));
 dash.draw('news-last', newsList('Last week'));
 dash.draw('hb-themes', (box) => { if (ok('news_themes')) hbars(box, D('news_themes').data.map(d => ({ label: d.theme, v: d.headlines })), v => d3.format(',')(v)); else if (bad('news_themes')) failBox(box); else { box.replaceChildren(); box.classList.add('dash-skeleton'); } });
+
+// ---------- jurisdictions compared ----------
+dash.calc('c_jur', {
+  inputs: ['jur_budget'], title: 'Jurisdictions compared, 2026-27',
+  description: 'Each 2026-27 budget figure in $ billion and as a share of that jurisdiction\'s 2026-27 GSP (GDP for the Commonwealth, using its published ratios); † marks a figure with a note.',
+  fn: (jur_budget) => {
+    const M = ['revenue', 'tax', 'expenses', 'nob', 'net_debt', 'gross_debt', 'infra'];
+    const b = v => v == null ? 'n.a.' : (v < 0 ? '-' : '') + '$' + (Math.abs(v) < 50 ? Math.abs(v).toLocaleString('en-AU') + 'm' : Math.abs(v / 1000).toLocaleString('en-AU', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'b');
+    return jur_budget.slice().sort((x, y) => x.order - y.order).map(r => {
+      const o = { code: r.code, jurisdiction: r.jurisdiction, gsp_b: b(r.gsp) + (r.note_gsp ? ' †' : '') };
+      M.forEach(m => {
+        const v = r[m], pub = r['pub_' + m], dag = r['note_' + m] ? ' †' : '';
+        const pct = v == null ? null : (pub != null ? pub : +(v / r.gsp * 100).toFixed(1));
+        o[m + '_b'] = b(v) + (v == null ? '' : dag);
+        o[m + '_pct'] = pct;
+        o[m + '_pct_text'] = pct == null ? 'n.a.' : pct.toFixed(1) + '%' + (dag || (r.note_gsp ? ' †' : ''));
+      });
+      return o;
+    });
+  }
+});
+dash.calc('c_jur_rank', {
+  inputs: ['c_jur'], title: 'Where NSW sits among the states',
+  description: 'NSW\'s position among the eight states and territories on each measure as a share of GSP, with the highest and lowest.',
+  fn: (c_jur) => {
+    const names = { revenue: 'Revenue', tax: 'Taxation', expenses: 'Expenses', nob: 'Budget result', net_debt: 'Net debt', gross_debt: 'Gross debt', infra: 'Infrastructure' };
+    const st = c_jur.filter(r => r.code !== 'CTH');
+    return Object.keys(names).map(m => {
+      const have = st.filter(r => r[m + '_pct'] != null).sort((a, b) => b[m + '_pct'] - a[m + '_pct']);
+      const nsw = have.find(r => r.code === 'NSW'), i = have.indexOf(nsw), hi = have[0], lo = have[have.length - 1];
+      const t = r => r.code + ' ' + r[m + '_pct'].toFixed(1) + '%';
+      return { measure: names[m], nsw_text: nsw ? nsw[m + '_pct'].toFixed(1) + '%' : 'n.a.', rank_text: nsw ? (i + 1) + ' of ' + have.length : 'n.a.', highest_text: hi ? t(hi) : 'n.a.', lowest_text: lo ? t(lo) : 'n.a.' };
+    });
+  }
+});
+dash.calc('c_jur_growth', {
+  inputs: ['jur_growth'], title: 'Tax and expense growth since 2022-23',
+  description: 'Growth from the 2022-23 actual to the 2026-27 Budget estimate as a percentage of the 2022-23 figure, the average annual rate over four years, and tax growth less expense growth.',
+  fn: (jur_growth) => {
+    const b = v => v == null ? 'n.a.' : '$' + (v / 1000).toLocaleString('en-AU', { minimumFractionDigits: 1, maximumFractionDigits: 1 }) + 'b';
+    const g = (a, z) => a == null || z == null ? null : +((z / a - 1) * 100).toFixed(1);
+    const c = (a, z) => a == null || z == null ? null : +((Math.pow(z / a, 1 / 4) - 1) * 100).toFixed(1);
+    const p = v => v == null ? 'n.a.' : (v > 0 ? '+' : '') + v.toFixed(1) + '%';
+    return jur_growth.map(r => {
+      const tg = g(r.tax_2223, r.tax_2627), eg = g(r.exp_2223, r.exp_2627), dt = r.note_tax ? ' †' : '', de = r.note_exp ? ' †' : '';
+      return { code: r.code, jurisdiction: r.jurisdiction, tax_2223_b: b(r.tax_2223), tax_2627_b: b(r.tax_2627), tax_growth: tg, tax_growth_text: p(tg) + (tg == null ? '' : dt), tax_cagr_text: p(c(r.tax_2223, r.tax_2627)),
+        exp_2223_b: b(r.exp_2223), exp_2627_b: b(r.exp_2627), exp_growth: eg, exp_growth_text: p(eg) + (eg == null ? '' : de), exp_cagr_text: p(c(r.exp_2223, r.exp_2627)),
+        gap: tg == null || eg == null ? null : +(tg - eg).toFixed(1), gap_text: tg == null || eg == null ? 'n.a.' : (tg - eg > 0 ? '+' : '') + (tg - eg).toFixed(1) + ' pts' };
+    });
+  }
+});
+
+let jurMetric = 'net_debt';
+document.querySelectorAll('.jur-metric').forEach(sel => sel.addEventListener('change', () => { jurMetric = sel.value; dash.draw('ch-jur'); }));
+const jurNames = { revenue: 'Revenue', tax: 'Taxation', expenses: 'Expenses', nob: 'Budget result', net_debt: 'Net debt', gross_debt: 'Gross debt', infra: 'Infrastructure' };
+
+function hbarChart(box, items, o) {
+  const W = Math.max(260, box.clientWidth), bh = 22, gap = 8, mt = 4, H = mt + items.length * (bh + gap) + 18;
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const ml = Math.ceil(measure(svg, items.map(d => d.label))) + 12, vals = items.map(d => d.v).concat([0]);
+  const labW = Math.ceil(measure(svg, items.map(d => o.fmt(d.v) + (d.flag ? ' †' : '')))) + 8;
+  const x = d3.scaleLinear(d3.extent(vals), [ml, W - labW]).nice();
+  svg.append('line').attr('class', 'zl').attr('x1', x(0)).attr('x2', x(0)).attr('y1', mt).attr('y2', H - 18);
+  items.forEach((d, i) => {
+    const y = mt + i * (bh + gap);
+    svg.append('text').attr('class', 'tk').attr('x', ml - 8).attr('y', y + bh / 2 + 4).attr('text-anchor', 'end').text(d.label);
+    svg.append('rect').attr('x', Math.min(x(0), x(d.v))).attr('width', Math.max(1, Math.abs(x(d.v) - x(0)))).attr('y', y).attr('height', bh).attr('rx', 4).attr('fill', d.hi ? col(0) : 'var(--cds-chart-muted)');
+    svg.append('text').attr('class', 'tk').attr('x', d.v >= 0 ? x(d.v) + 4 : x(0) + 4).attr('y', y + bh / 2 + 4).text(o.fmt(d.v) + (d.flag ? ' †' : ''));
+  });
+}
+chartDraw('ch-jur', ['c_jur'], b => {
+  const m = jurMetric, items = D('c_jur').data.filter(r => r.code !== 'CTH' && r[m + '_pct'] != null).sort((a, c) => c[m + '_pct'] - a[m + '_pct'])
+    .map(r => ({ label: r.code, v: r[m + '_pct'], hi: r.code === 'NSW', flag: /†/.test(r[m + '_pct_text']) }));
+  hbarChart(b, items, { fmt: v => v.toFixed(1) + '%' });
+});
+function growthChart(box, rows) {
+  const W = Math.max(260, box.clientWidth), H = 280, mb = 22, mt = 10;
+  const data = rows.filter(r => r.tax_growth != null && r.exp_growth != null);
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const y = d3.scaleLinear([0, d3.max(data, d => Math.max(d.tax_growth, d.exp_growth))], [H - mb, mt]).nice(5), ticks = y.ticks(5);
+  const ml = Math.ceil(measure(svg, ticks.map(t => t + '%'))) + 10, mr = 6;
+  const x0 = d3.scaleBand(data.map(d => d.code), [ml, W - mr]).paddingInner(0.25), x1 = d3.scaleBand(['tax', 'exp'], [0, x0.bandwidth()]).padding(0.08);
+  svg.append('g').selectAll('line').data(ticks).join('line').attr('class', d => d === 0 ? 'zl' : 'gl').attr('x1', ml).attr('x2', W - mr).attr('y1', d => y(d)).attr('y2', d => y(d));
+  svg.append('g').selectAll('text').data(ticks).join('text').attr('class', 'tk').attr('x', ml - 6).attr('y', d => y(d) + 4).attr('text-anchor', 'end').text(d => d + '%');
+  data.forEach(d => [['tax', d.tax_growth, 0], ['exp', d.exp_growth, 1]].forEach(([k, v, c]) => {
+    const bw = Math.min(28, x1.bandwidth()), xx = x0(d.code) + x1(k) + (x1.bandwidth() - bw) / 2;
+    svg.append('rect').attr('x', xx).attr('width', bw).attr('y', y(v)).attr('height', y(0) - y(v)).attr('rx', Math.min(4, bw / 2)).attr('fill', col(c)).attr('fill-opacity', d.code === 'NSW' ? 1 : 0.55);
+  }));
+  svg.append('g').selectAll('text').data(data).join('text').attr('class', 'tk').attr('x', d => x0(d.code) + x0.bandwidth() / 2).attr('y', H - 4).attr('text-anchor', 'middle').attr('font-weight', d => d.code === 'NSW' ? 600 : null).text(d => d.code);
+  addTooltip(box, svg, W, H, ml, mr, (mx) => { const st = x0.step(), i = Math.max(0, Math.min(data.length - 1, Math.floor((mx - ml) / st))), r = data[i]; return r ? { r, px: x0(r.code) + x0.bandwidth() / 2 } : null; }, (d, tt) => {
+    ttHead(tt, d.r.jurisdiction); ttRow(tt, col(0), 'Taxation', d.r.tax_growth_text); ttRow(tt, col(1), 'Expenses', d.r.exp_growth_text); ttRow(tt, null, 'Gap', d.r.gap_text);
+  });
+}
+chartDraw('ch-jur-growth', ['c_jur_growth'], b => growthChart(b, D('c_jur_growth').data));
+const markNsw = tb => tb.querySelectorAll('tr').forEach(tr => tr.classList.toggle('nsw-row', tr.dataset.key === encodeURIComponent('New South Wales')));
+const jurCols = ['jurisdiction', 'revenue', 'tax', 'expenses', 'nob', 'net_debt', 'gross_debt', 'infra'];
+tableDraw('tb-jur-dollars', ['c_jur'], tb => { fillRows(tb, D('c_jur').data, jurCols.map(c => c === 'jurisdiction' ? c : c + '_b').concat(['gsp_b']), {}, 'jurisdiction'); markNsw(tb); });
+tableDraw('tb-jur-pct', ['c_jur'], tb => { fillRows(tb, D('c_jur').data, jurCols.map(c => c === 'jurisdiction' ? c : c + '_pct_text'), {}, 'jurisdiction'); markNsw(tb); });
+tableDraw('tb-jur-rank', ['c_jur_rank'], tb => fillRows(tb, D('c_jur_rank').data, ['measure', 'nsw_text', 'rank_text', 'highest_text', 'lowest_text'], {}, 'measure'));
+const withOutlook = (r, k) => r[k] + (r[k + '_outlook'] ? ' / ' + r[k + '_outlook'] : '');
+tableDraw('tb-jur-ratings', ['jur_ratings'], tb => fillRows(tb, D('jur_ratings').data, ['jurisdiction', 'sp', 'moodys', 'fitch', 'note'], { sp: (td, v, r) => { td.textContent = withOutlook(r, 'sp'); }, moodys: (td, v, r) => { td.textContent = withOutlook(r, 'moodys'); }, fitch: (td, v, r) => { td.textContent = withOutlook(r, 'fitch'); } }, 'jurisdiction'));
+tableDraw('tb-jur-growth', ['c_jur_growth'], tb => { fillRows(tb, D('c_jur_growth').data, ['jurisdiction', 'tax_2223_b', 'tax_2627_b', 'tax_growth_text', 'tax_cagr_text', 'exp_2223_b', 'exp_2627_b', 'exp_growth_text', 'exp_cagr_text', 'gap_text'], {}, 'jurisdiction'); markNsw(tb); });
+dash.draw('jur-notes', (ul) => {
+  ul.replaceChildren(); if (!ok('jur_budget', 'jur_growth')) return;
+  const lab = { revenue: 'revenue', tax: 'taxation', expenses: 'expenses', nob: 'budget result', net_debt: 'net debt', gross_debt: 'gross debt', infra: 'infrastructure', gsp: 'GSP' };
+  const add = (head, text) => { const li = document.createElement('li'), b = document.createElement('b'); b.textContent = head + '. '; li.append(b, text); ul.append(li); };
+  D('jur_budget').data.slice().sort((a, c) => a.order - c.order).forEach(r => {
+    const bits = [];
+    if (r.code !== 'CTH') bits.push('GSP: ' + r.gsp_basis + '.' + (r.note_gsp ? ' ' + r.note_gsp : ''));
+    Object.keys(lab).filter(k => k !== 'gsp').forEach(k => { if (r['note_' + k]) bits.push(lab[k][0].toUpperCase() + lab[k].slice(1) + ': ' + r['note_' + k]); });
+    if (r.infra_scope) bits.push('Infrastructure measure: ' + r.infra_scope + '.');
+    if (r.program) bits.push('Headline program: ' + r.program + '.');
+    const gr = D('jur_growth').data.find(x => x.code === r.code);
+    if (gr && gr.note_exp) bits.push('Growth, expenses: ' + gr.note_exp);
+    if (gr && gr.note_tax) bits.push('Growth, taxation: ' + gr.note_tax);
+    add(r.jurisdiction + ' (' + r.doc + ', ' + r.released + ')', bits.join(' '));
+  });
+  add('Bases', 'All figures are general government sector unless a note says otherwise, as each government reports them in its 2026-27 Budget. Growth figures compare each government\'s own 2022-23 actual with its own 2026-27 Budget estimate. Ratios for SA and the NT use derived GSP and are approximate.');
+});
 
 // ---------- tile tones ----------
 dash.onData(() => {
