@@ -391,6 +391,66 @@ table.tb.wrap td:nth-child(2), table.tb.wrap th:nth-child(2) { text-align: left;
         <div class="tbl-wrap"><table class="tb" id="tb-jur-wf" data-source="c_jur_wf" data-row-key="jurisdiction"><thead><tr><th data-field="jurisdiction">Jurisdiction</th><th data-field="jun23_text">Jun-23</th><th data-field="jun24_text">Jun-24</th><th data-field="jun25_text">Jun-25</th><th data-field="jun26_text">Jun-26</th><th data-field="added_text">Jobs added</th><th data-field="growth_text">Growth since Jun-23</th><th data-field="cagr_text">Per year</th><th data-field="last_text">Latest year</th><th data-field="per1000_text">Per 1,000 residents</th></tr></thead><tbody data-draw="tb-jur-wf"></tbody></table></div>
     </div>
 
+    <div class="card" id="card-jur-yearly" style="margin-top: var(--cds-gap-md)"><h3>Year-by-year growth</h3><p class="note">Per cent change on the previous year: taxation and expenses for each financial year from 2023-24 to the 2026-27 Budget, public sector employee jobs for the years to June 2024, 2025 and 2026. 2023-24 and 2024-25 are actuals except where noted, 2025-26 is each government's revised estimate and 2026-27 its Budget. Gaps are years whose figures could not be retrieved.</p>
+      <select class="dash-select jur-metric jur-ymetric" aria-label="Measure to chart">
+        <option value="tax" selected>Taxation</option>
+        <option value="exp">Expenses</option>
+        <option value="jobs">Public sector employee jobs</option>
+      </select>
+      <div class="chart tall dash-skeleton" id="ch-jur-yearly" data-draw="ch-jur-yearly" data-source="c_jur_yearly"></div>
+      <div class="legend"><span><i class="sw blk" data-c="0"></i>2023-24</span><span><i class="sw blk" data-c="1"></i>2024-25</span><span><i class="sw blk" data-c="2"></i>2025-26</span><span><i class="sw blk" data-c="3"></i>2026-27</span></div>
+      <div class="tbl-wrap" style="margin-top: var(--cds-gap-sm)"><table class="tb" id="tb-jur-yearly" data-source="c_jur_yearly" data-row-key="jurisdiction"><thead><tr><th data-field="jurisdiction">Jurisdiction</th><th data-field="tax_2324">Tax 23-24</th><th data-field="tax_2425">Tax 24-25</th><th data-field="tax_2526">Tax 25-26</th><th data-field="tax_2627">Tax 26-27</th><th data-field="exp_2324">Expenses 23-24</th><th data-field="exp_2425">Expenses 24-25</th><th data-field="exp_2526">Expenses 25-26</th><th data-field="exp_2627">Expenses 26-27</th><th data-field="jobs_2324">Jobs to Jun-24</th><th data-field="jobs_2425">Jobs to Jun-25</th><th data-field="jobs_2526">Jobs to Jun-26</th></tr></thead><tbody data-draw="tb-jur-yearly"></tbody></table></div>
+    </div>
+
+    <h2 class="td-h2" id="jur-exp-types">Expenses by type</h2>
+    <p class="td-lede">General government expenses split into six types, using each government's own operating statement for the 2026-27 Budget and the 2022-23 actual. Choose how to compare them: dollars, share of each government's total expenses, dollars per person, per cent of GSP or GDP, or growth since 2022-23.</p>
+    <div class="card" id="card-exp-types">
+      <select class="dash-select jur-metric exp-basis" aria-label="Basis for the expenses table">
+        <option value="m" selected>$ million, 2026-27</option>
+        <option value="share">Share of total expenses, 2026-27</option>
+        <option value="share23">Share of total expenses, 2022-23</option>
+        <option value="pc">Dollars per person, 2026-27</option>
+        <option value="gsp">Per cent of GSP or GDP, 2026-27</option>
+        <option value="g">Growth, 2022-23 to 2026-27</option>
+        <option value="cagr">Average annual growth, 2022-23 to 2026-27</option>
+        <option value="m23">$ million, 2022-23</option>
+      </select>
+      <div class="tbl-wrap"><table class="tb" id="tb-exp-types" data-source="c_exp_types" data-row-key="jurisdiction"><thead><tr><th data-field="jurisdiction">Jurisdiction</th><th data-field="employee_m">Employee</th><th data-field="super_m">Superannuation</th><th data-field="dep_m">Depreciation and amortisation</th><th data-field="interest_m">Interest</th><th data-field="other_op_m">Other operating</th><th data-field="grants_m">Grants, subsidies and transfers</th><th data-field="total_m">Total expenses</th></tr></thead><tbody data-draw="tb-exp-types"></tbody></table></div>
+    </div>
+    <div class="card" id="card-exp-mix" style="margin-top: var(--cds-gap-md)"><h3>What each government spends its budget on</h3><p class="note">Share of total general government expenses by type. Hover a bar for the figures.</p>
+      <select class="dash-select jur-metric exp-mix-year" aria-label="Year to chart">
+        <option value="2627" selected>2026-27 Budget</option>
+        <option value="2223">2022-23 actual</option>
+      </select>
+      <div class="chart dash-skeleton" id="ch-exp-mix" data-draw="ch-exp-mix" data-source="c_exp_types"></div>
+      <div class="legend"><span><i class="sw blk" data-c="0"></i>Employee</span><span><i class="sw blk" data-c="1"></i>Superannuation</span><span><i class="sw blk" data-c="2"></i>Depreciation and amortisation</span><span><i class="sw blk" data-c="3"></i>Interest</span><span><i class="sw blk" data-c="4"></i>Other operating</span><span><i class="sw blk" data-c="5"></i>Grants, subsidies and transfers</span></div>
+    </div>
+
+    <h2 class="td-h2" id="jur-tax-types">Taxation by type</h2>
+    <p class="td-lede">State and territory taxation split into eight types, using each government's own taxation tables for the 2026-27 Budget and the 2022-23 actual. The Commonwealth is left out: it levies none of these taxes, and its revenue is mainly income tax and GST.</p>
+    <div class="card" id="card-tax-types">
+      <select class="dash-select jur-metric tax-basis" aria-label="Basis for the taxation table">
+        <option value="m" selected>$ million, 2026-27</option>
+        <option value="share">Share of total taxation, 2026-27</option>
+        <option value="share23">Share of total taxation, 2022-23</option>
+        <option value="pc">Dollars per person, 2026-27</option>
+        <option value="gsp">Per cent of GSP, 2026-27</option>
+        <option value="g">Growth, 2022-23 to 2026-27</option>
+        <option value="cagr">Average annual growth, 2022-23 to 2026-27</option>
+        <option value="m23">$ million, 2022-23</option>
+      </select>
+      <div class="tbl-wrap"><table class="tb" id="tb-tax-types" data-source="c_tax_types" data-row-key="jurisdiction"><thead><tr><th data-field="jurisdiction">Jurisdiction</th><th data-field="transfer_m">Transfer duty</th><th data-field="insurance_m">Insurance duty</th><th data-field="mv_duty_m">Motor vehicle stamp duty</th><th data-field="payroll_m">Payroll tax</th><th data-field="land_m">Land tax</th><th data-field="mv_taxes_m">Taxes on motor vehicles</th><th data-field="gambling_m">Gambling and betting</th><th data-field="other_m">Other taxes</th><th data-field="total_m">Total taxation</th></tr></thead><tbody data-draw="tb-tax-types"></tbody></table></div>
+    </div>
+    <div class="card" id="card-tax-mix" style="margin-top: var(--cds-gap-md)"><h3>Where each government's tax comes from</h3><p class="note">Share of total taxation by type. Hover a bar for the figures.</p>
+      <select class="dash-select jur-metric tax-mix-year" aria-label="Year to chart">
+        <option value="2627" selected>2026-27 Budget</option>
+        <option value="2223">2022-23 actual</option>
+      </select>
+      <div class="chart dash-skeleton" id="ch-tax-mix" data-draw="ch-tax-mix" data-source="c_tax_types"></div>
+      <div class="legend"><span><i class="sw blk" data-c="0"></i>Transfer duty</span><span><i class="sw blk" data-c="1"></i>Insurance duty</span><span><i class="sw blk" data-c="2"></i>Motor vehicle stamp duty</span><span><i class="sw blk" data-c="3"></i>Payroll tax</span><span><i class="sw blk" data-c="4"></i>Land tax</span><span><i class="sw blk" data-c="5"></i>Taxes on motor vehicles</span><span><i class="sw blk" data-c="6"></i>Gambling and betting</span><span><i class="sw blk" data-c="7"></i>Other taxes</span></div>
+    </div>
+    <ul class="notes jur-type-notes" data-draw="jur-type-notes" data-source="jur_exp_types jur_tax_types jur_annual"></ul>
+
     <details class="card jur-notes" id="jur-notes" style="margin-top: var(--cds-gap-md)">
       <summary>Notes on the comparison and sources</summary>
       <h3>Notes</h3>
@@ -1110,6 +1170,119 @@ dash.draw('jur-notes', (ul) => {
     add(r.jurisdiction + ' (' + r.doc + ', ' + r.released + ')', bits.join(' '));
   });
   add('Bases', 'All figures are general government sector unless a note says otherwise, as each government reports them in its 2026-27 Budget. Growth figures compare each government\'s own 2022-23 actual with its own 2026-27 Budget estimate. Ratios for SA and the NT use derived GSP and are approximate.');
+});
+
+// ---------- expenses and taxation by type, year-by-year growth ----------
+const EXPK = ['employee', 'super', 'dep', 'interest', 'other_op', 'grants'], TAXK = ['transfer', 'insurance', 'mv_duty', 'payroll', 'land', 'mv_taxes', 'gambling', 'other'];
+const JORDER = ['CTH', 'NSW', 'VIC', 'QLD', 'WA', 'SA', 'TAS', 'ACT', 'NT'];
+function typeCalc(rows, budget, keys) {
+  const fm = v => v == null ? 'n.a.' : (v < 0 ? '-' : '') + Math.abs(v).toLocaleString('en-AU', { maximumFractionDigits: Math.abs(v) < 1000 && v % 1 ? 1 : 0 });
+  const pct = (v, d = 1) => v == null || !isFinite(v) ? 'n.a.' : v.toFixed(d) + '%', sg = v => v == null || !isFinite(v) ? 'n.a.' : (v > 0 ? '+' : '') + v.toFixed(1) + '%';
+  const out = [];
+  JORDER.forEach(code => {
+    const a = rows.find(r => r.code === code && r.year === '2026-27'), z = rows.find(r => r.code === code && r.year === '2022-23'), b = budget.find(r => r.code === code);
+    if (!a) return;
+    const o = { code, jurisdiction: a.jurisdiction };
+    keys.concat(['total']).forEach(k => {
+      const v = a[k], v0 = z ? z[k] : null;
+      o[k + '_m'] = fm(v); o[k + '_m23'] = fm(v0);
+      o[k + '_s27'] = v == null ? null : v / a.total * 100; o[k + '_s23'] = v0 == null ? null : v0 / z.total * 100;
+      o[k + '_share'] = pct(o[k + '_s27']); o[k + '_share23'] = pct(o[k + '_s23']);
+      o[k + '_pc'] = v == null || !b || !b.pop ? 'n.a.' : '$' + Math.round(v * 1e6 / b.pop).toLocaleString('en-AU');
+      o[k + '_gsp'] = v == null || !b ? 'n.a.' : pct(v / b.gsp * 100, 2);
+      const ng = v == null || v0 == null || (z && (z.nogrowth || '').split(',').includes(k));
+      o[k + '_g'] = ng ? 'n.a.' : sg((v / v0 - 1) * 100);
+      o[k + '_cagr'] = ng ? 'n.a.' : sg((Math.pow(v / v0, 1 / 4) - 1) * 100);
+    });
+    out.push(o);
+  });
+  return out;
+}
+dash.calc('c_exp_types', {
+  inputs: ['jur_exp_types', 'jur_budget'], title: 'Expenses by type, by jurisdiction',
+  description: 'General government expenses by type for the 2026-27 Budget and 2022-23 actual: $ million, share of total expenses, dollars per person (ABS population at 31 March 2026), per cent of 2026-27 GSP or GDP, and growth since 2022-23.',
+  fn: (jur_exp_types, jur_budget) => typeCalc(jur_exp_types, jur_budget, EXPK)
+});
+dash.calc('c_tax_types', {
+  inputs: ['jur_tax_types', 'jur_budget'], title: 'Taxation by type, by state and territory',
+  description: 'State and territory taxation by type for the 2026-27 Budget and 2022-23 actual: $ million, share of total taxation, dollars per person (ABS population at 31 March 2026), per cent of 2026-27 GSP, and growth since 2022-23.',
+  fn: (jur_tax_types, jur_budget) => typeCalc(jur_tax_types, jur_budget, TAXK)
+});
+dash.calc('c_jur_yearly', {
+  inputs: ['jur_annual', 'jur_workforce'], title: 'Year-by-year growth by jurisdiction',
+  description: 'Per cent change on the previous year in taxation and expenses (2023-24 to 2026-27) and public sector employee jobs (years to June 2024 to June 2026), for each jurisdiction.',
+  fn: (jur_annual, jur_workforce) => {
+    const Y = ['2022-23', '2023-24', '2024-25', '2025-26', '2026-27'], sg = v => v == null ? 'n.a.' : (v > 0 ? '+' : '') + v.toFixed(1) + '%';
+    const g = (a, b) => a == null || b == null ? null : +((b / a - 1) * 100).toFixed(1);
+    return JORDER.filter(c => jur_annual.some(r => r.code === c) || jur_workforce.some(r => r.code === c)).map(code => {
+      const rs = Y.map(y => jur_annual.find(r => r.code === code && r.year === y) || {}), w = jur_workforce.find(r => r.code === code) || {};
+      const o = { code, jurisdiction: (rs.find(r => r.jurisdiction) || w).jurisdiction };
+      ['2324', '2425', '2526', '2627'].forEach((k, i) => { o['tax_' + k + '_v'] = g(rs[i].tax, rs[i + 1].tax); o['exp_' + k + '_v'] = g(rs[i].expenses, rs[i + 1].expenses); });
+      o.jobs_2324_v = w.jun23 ? g(w.jun23, w.jun24) : null; o.jobs_2425_v = w.jun24 ? g(w.jun24, w.jun25) : null; o.jobs_2526_v = w.jun25 ? (w.last_pct_abs != null ? w.last_pct_abs : g(w.jun25, w.jun26)) : null; o.jobs_2627_v = null;
+      Object.keys(o).filter(k => k.endsWith('_v')).forEach(k => { o[k.slice(0, -2)] = sg(o[k]); });
+      return o;
+    });
+  }
+});
+let expBasis = 'm', taxBasis = 'm', expMixYear = '2627', taxMixYear = '2627', yMetric = 'tax';
+const onSel = (cls, fn) => document.querySelectorAll(cls).forEach(s => s.addEventListener('change', () => fn(s.value)));
+onSel('.exp-basis', v => { expBasis = v; dash.draw('tb-exp-types'); });
+onSel('.tax-basis', v => { taxBasis = v; dash.draw('tb-tax-types'); });
+onSel('.exp-mix-year', v => { expMixYear = v; dash.draw('ch-exp-mix'); });
+onSel('.tax-mix-year', v => { taxMixYear = v; dash.draw('ch-tax-mix'); });
+onSel('.jur-ymetric', v => { yMetric = v; dash.draw('ch-jur-yearly'); });
+tableDraw('tb-exp-types', ['c_exp_types'], tb => { fillRows(tb, D('c_exp_types').data, ['jurisdiction'].concat(EXPK.concat(['total']).map(k => k + '_' + expBasis)), {}, 'jurisdiction'); markNsw(tb); });
+tableDraw('tb-tax-types', ['c_tax_types'], tb => { fillRows(tb, D('c_tax_types').data, ['jurisdiction'].concat(TAXK.concat(['total']).map(k => k + '_' + taxBasis)), {}, 'jurisdiction'); markNsw(tb); });
+tableDraw('tb-jur-yearly', ['c_jur_yearly'], tb => { fillRows(tb, D('c_jur_yearly').data, ['jurisdiction', 'tax_2324', 'tax_2425', 'tax_2526', 'tax_2627', 'exp_2324', 'exp_2425', 'exp_2526', 'exp_2627', 'jobs_2324', 'jobs_2425', 'jobs_2526'], {}, 'jurisdiction'); markNsw(tb); });
+const EXPL = ['Employee', 'Superannuation', 'Depreciation and amortisation', 'Interest', 'Other operating', 'Grants, subsidies and transfers'];
+const TAXL = ['Transfer duty', 'Insurance duty', 'Motor vehicle stamp duty', 'Payroll tax', 'Land tax', 'Taxes on motor vehicles', 'Gambling and betting', 'Other taxes'];
+function mixChart(box, rows, keys, labels, suf) {
+  const data = rows.filter(r => r['total_s' + suf] != null), W = Math.max(260, box.clientWidth), bh = 18, gap = 8, mt = 4, H = mt + data.length * (bh + gap) + 18;
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const ml = Math.ceil(measure(svg, data.map(r => r.code))) + 10, x = d3.scaleLinear([0, 100], [ml, W - 8]);
+  [0, 25, 50, 75, 100].forEach(t => { svg.append('line').attr('class', t ? 'gl' : 'zl').attr('x1', x(t)).attr('x2', x(t)).attr('y1', mt).attr('y2', H - 18); svg.append('text').attr('class', 'tk').attr('x', x(t)).attr('y', H - 4).attr('text-anchor', 'middle').text(t + '%'); });
+  data.forEach((r, i) => {
+    const y = mt + i * (bh + gap); let acc = 0;
+    svg.append('text').attr('class', 'tk').attr('x', ml - 8).attr('y', y + bh / 2 + 4).attr('text-anchor', 'end').attr('font-weight', r.code === 'NSW' ? 600 : null).style('fill', r.code === 'NSW' ? 'var(--color-fg)' : null).text(r.code);
+    keys.forEach((k, j) => { const v = r[k + '_s' + suf] || 0; svg.append('rect').attr('x', x(acc)).attr('width', Math.max(0, x(acc + v) - x(acc) - 1)).attr('y', y).attr('height', bh).attr('fill', col(j)).attr('fill-opacity', r.code === 'NSW' ? 1 : 0.8); acc += v; });
+  });
+  const tt = document.createElement('div'); tt.className = 'tt'; box.append(tt);
+  svg.on('pointermove', ev => { const [mx, my] = d3.pointer(ev); const i = Math.floor((my - mt) / (bh + gap)), r = data[i]; if (!r || mx < ml) { tt.style.opacity = 0; return; }
+    ttHead(tt, r.jurisdiction + (suf === '27' ? ', 2026-27' : ', 2022-23')); keys.forEach((k, j) => ttRow(tt, col(j), labels[j], r[k + '_s' + suf] == null ? 'n.a.' : r[k + '_s' + suf].toFixed(1) + '%'));
+    const bw = box.clientWidth, px = mx / W * bw; tt.style.left = Math.max(0, Math.min(px + 12, bw - tt.offsetWidth)) + 'px'; tt.style.top = Math.max(0, my / H * box.clientHeight - 20) + 'px'; tt.style.opacity = 1; })
+    .on('pointerleave', () => { tt.style.opacity = 0; });
+}
+chartDraw('ch-exp-mix', ['c_exp_types'], b => mixChart(b, D('c_exp_types').data, EXPK, EXPL, expMixYear === '2627' ? '27' : '23'));
+chartDraw('ch-tax-mix', ['c_tax_types'], b => mixChart(b, D('c_tax_types').data, TAXK, TAXL, taxMixYear === '2627' ? '27' : '23'));
+chartDraw('ch-jur-yearly', ['c_jur_yearly'], box => {
+  const ks = ['2324', '2425', '2526', '2627'].filter(k => !(yMetric === 'jobs' && k === '2627')), yl = { '2324': '2023-24', '2425': '2024-25', '2526': '2025-26', '2627': '2026-27' };
+  const data = D('c_jur_yearly').data.filter(r => ks.some(k => r[yMetric + '_' + k + '_v'] != null));
+  const W = Math.max(260, box.clientWidth), H = 280, mb = 22, mt = 14, vals = data.flatMap(r => ks.map(k => r[yMetric + '_' + k + '_v'])).filter(v => v != null).concat([0]);
+  const svg = d3.select(box).append('svg').attr('width', '100%').attr('viewBox', `0 0 ${W} ${H}`);
+  const y = d3.scaleLinear(d3.extent(vals), [H - mb, mt]).nice(5), ticks = y.ticks(5), ml = Math.ceil(measure(svg, ticks.map(t => t + '%'))) + 10, mr = 6;
+  const x0 = d3.scaleBand(data.map(d => d.code), [ml, W - mr]).paddingInner(0.22), x1 = d3.scaleBand(ks, [0, x0.bandwidth()]).padding(0.08);
+  svg.append('g').selectAll('line').data(ticks).join('line').attr('class', d => d === 0 ? 'zl' : 'gl').attr('x1', ml).attr('x2', W - mr).attr('y1', d => y(d)).attr('y2', d => y(d));
+  svg.append('g').selectAll('text').data(ticks).join('text').attr('class', 'tk').attr('x', ml - 6).attr('y', d => y(d) + 4).attr('text-anchor', 'end').text(d => d + '%');
+  data.forEach(d => ks.forEach((k, c) => { const v = d[yMetric + '_' + k + '_v']; if (v == null) return; const bw = Math.min(18, x1.bandwidth()), xx = x0(d.code) + x1(k) + (x1.bandwidth() - bw) / 2;
+    svg.append('rect').attr('x', xx).attr('width', bw).attr('y', Math.min(y(v), y(0))).attr('height', Math.max(1, Math.abs(y(0) - y(v)))).attr('rx', Math.min(3, bw / 2)).attr('fill', col(c)).attr('fill-opacity', d.code === 'NSW' ? 1 : 0.55); }));
+  svg.append('g').selectAll('text').data(data).join('text').attr('class', 'tk').attr('x', d => x0(d.code) + x0.bandwidth() / 2).attr('y', H - 4).attr('text-anchor', 'middle').attr('font-weight', d => d.code === 'NSW' ? 600 : null).text(d => d.code);
+  addTooltip(box, svg, W, H, ml, mr, (mx) => { const st = x0.step(), i = Math.max(0, Math.min(data.length - 1, Math.floor((mx - ml) / st))), r = data[i]; return r ? { r, px: x0(r.code) + x0.bandwidth() / 2 } : null; }, (d, tt) => {
+    ttHead(tt, d.r.jurisdiction); ks.forEach((k, c) => ttRow(tt, col(c), yl[k], d.r[yMetric + '_' + k]));
+  });
+});
+dash.draw('jur-type-notes', (ul) => {
+  ul.replaceChildren(); if (!ok('jur_exp_types', 'jur_tax_types', 'jur_annual')) return;
+  const add = (head, text) => { const li = document.createElement('li'), b = document.createElement('b'); b.textContent = head + '. '; li.append(b, text); ul.append(li); };
+  add('How the types are grouped', 'Each government labels and groups its expenses and taxes differently. The groupings used for each jurisdiction are below. Shares are of each government\'s own total general government expenses or taxation. Per person uses ABS estimated resident population at 31 March 2026; per cent of GSP or GDP uses the 2026-27 GSP or GDP in the comparison above. Average annual growth is over four years. n.a. means the figure could not be retrieved in a comparable form and has not been estimated.');
+  JORDER.forEach(c => {
+    const e = D('jur_exp_types').data.filter(r => r.code === c), t = D('jur_tax_types').data.filter(r => r.code === c), a = D('jur_annual').data.find(r => r.code === c);
+    if (!e.length && !t.length && !a) return;
+    const bits = [];
+    if (e.length) bits.push('Expenses: ' + (e[0].note ? e[0].note + ' ' : '') + 'Sources: ' + e.map(r => r.year + ', ' + r.source).join('; ') + '.');
+    if (t.length) bits.push('Taxation: ' + (t[0].note ? t[0].note + ' ' : '') + 'Sources: ' + t.map(r => r.year + ', ' + r.source).join('; ') + '.');
+    if (a) bits.push('Annual series: ' + a.note);
+    add((e[0] || t[0] || a).jurisdiction, bits.join(' '));
+  });
 });
 
 // ---------- tile sparklines and changes ----------

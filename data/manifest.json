@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-10T21:13:13Z",
+ "generated": "2026-11-10T22:21:44Z",
  "datasets": {
   "abs_approvals_nsw": {
    "title": "NSW dwelling approvals by type",
@@ -211,19 +211,33 @@
    "schedule": "Fixed to the 2026-27 NSW Budget; rebuilt when NSW Treasury publishes the next fiscal update. The daily refresh checks for one.",
    "blob": "c9357bbe356ded10701f028b1f2244a6"
   },
+  "jur_annual": {
+   "title": "Annual taxation and expenses by jurisdiction",
+   "description": "General government taxation and total expenses ($m) for each government, 2022-23 to 2026-27: actuals, 2025-26 revised estimates and 2026-27 Budget, with sources and gaps noted.",
+   "updated": "2026-11-10T22:21:00Z",
+   "schedule": "Fixed to the 2026-27 budgets; rebuilt when governments publish new budgets or annual reports.",
+   "blob": "c961a8933249b4ae91eb50ba2a64732f"
+  },
   "jur_budget": {
    "title": "Jurisdictions compared, 2026-27 budgets",
    "description": "Commonwealth, state and territory 2026-27 Budget figures ($m): revenue, taxation, expenses, net operating balance, net and gross debt at 30 June 2027, infrastructure spending, GSP or GDP, and ABS estimated resident population at 31 March 2026, general government sector unless noted, each with its source table and caveats.",
-   "updated": "2026-11-10T21:15:00Z",
+   "updated": "2026-11-10T22:21:00Z",
    "schedule": "Fixed to the 2026-27 budgets; rebuilt when governments publish new budgets or mid-year updates. The daily refresh checks for them.",
-   "blob": "97cae4a5baf56460ae67fd0c5d58c8bc"
+   "blob": "54f641446df37bd21812b593809eae8b"
+  },
+  "jur_exp_types": {
+   "title": "Expenses by type, by jurisdiction",
+   "description": "General government expenses by type (employee, superannuation, depreciation and amortisation, interest, other operating, grants subsidies and transfers) for each government, 2022-23 actual and 2026-27 Budget ($m), from each government's own operating statement, with the source table for each.",
+   "updated": "2026-11-10T22:21:00Z",
+   "schedule": "Fixed to the 2026-27 budgets; rebuilt when governments publish new budgets or annual reports.",
+   "blob": "3677b10d7e7dea77a4b6b74af43b0044"
   },
   "jur_growth": {
    "title": "Tax and expense growth since 2022-23",
    "description": "General government taxation and expenses ($m) for each jurisdiction: 2022-23 actual and 2026-27 Budget estimate, with sources and caveats.",
-   "updated": "2026-11-10T00:00:00Z",
+   "updated": "2026-11-10T22:21:00Z",
    "schedule": "Fixed to the 2026-27 budgets; rebuilt when governments publish new budgets. The daily refresh checks for them.",
-   "blob": "5b42cd9e9da64d11789b78112e6d8a0c"
+   "blob": "39e569b319e334005aa930b4c9c657f0"
   },
   "jur_ratings": {
    "title": "Credit ratings by jurisdiction",
@@ -231,6 +245,13 @@
    "updated": "2026-11-10T00:00:00Z",
    "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when an agency announces a rating action.",
    "blob": "e45274c7c1b7a8f98863bbcfada02eaa"
+  },
+  "jur_tax_types": {
+   "title": "Taxation by type, by state and territory",
+   "description": "State and territory taxation by type (transfer duty, insurance duty, motor vehicle stamp duty, payroll tax, land tax, taxes on motor vehicles, gambling and betting, other), 2022-23 actual and 2026-27 Budget ($m), from each government's own taxation tables.",
+   "updated": "2026-11-10T22:21:00Z",
+   "schedule": "Fixed to the 2026-27 budgets; rebuilt when governments publish new budgets or annual reports.",
+   "blob": "54ce82ae5bb40f7f481a6c18e3cae226"
   },
   "jur_workforce": {
    "title": "Public sector employee jobs by jurisdiction",
