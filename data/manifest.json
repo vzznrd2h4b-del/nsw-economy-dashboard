@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-10T07:22:56Z",
+ "generated": "2026-11-10T07:45:26Z",
  "datasets": {
   "abs_approvals_nsw": {
    "title": "NSW dwelling approvals by type",
@@ -98,6 +98,13 @@
    "updated": "2026-11-10T04:18:52Z",
    "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
    "blob": "ad1a0b9239c8673130e525ec94f1bbdc"
+  },
+  "abs_sfd_jur": {
+   "title": "State final demand by state and territory",
+   "description": "ABS National Accounts (dataflow ANA_SFD): state final demand, chain volume measures $m, seasonally adjusted, quarterly from March quarter 2018, for all eight states and territories.",
+   "updated": "2026-11-10T07:50:00Z",
+   "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
+   "blob": "f9776d8acfcf7ab2d18e5103d7985e32"
   },
   "abs_sfd_nsw": {
    "title": "NSW state final demand",
