@@ -230,6 +230,7 @@ table.tb.wrap td:nth-child(2), table.tb.wrap th:nth-child(2) { text-align: left;
     <p class="td-lede">ABS, RBA and ASIC series. The dashed vertical line marks the March 2023 state election. Hover any chart for values.</p>
     <div class="grid">
       <div class="card" id="card-sfd"><h3>NSW state final demand growth</h3><p class="note">Real, per cent change through the year</p><div class="chart dash-skeleton" id="ch-sfd" data-draw="ch-sfd" data-source="c_sfd_growth refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>Seasonally adjusted</span><span><i class="sw dash" data-c="1"></i>Trend</span></div></div>
+      <div class="card" id="card-sfd-q"><h3>NSW state final demand, quarterly growth</h3><p class="note">Real, per cent change on the previous quarter, seasonally adjusted, last 12 quarters</p><div class="chart dash-skeleton" id="ch-sfd-q" data-draw="ch-sfd-q" data-source="c_sfd_growth"></div></div>
       <div class="card" id="card-wages"><h3>Wages against prices</h3><p class="note">Wage price index, per cent change through the year; real wages are NSW wage growth less Sydney CPI growth</p><div class="chart dash-skeleton" id="ch-wages" data-draw="ch-wages" data-source="c_wages refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>NSW, all sectors</span><span><i class="sw" data-c="2"></i>NSW private</span><span><i class="sw" data-c="3"></i>NSW public</span><span><i class="sw dash" data-c="1"></i>Australia</span><span><i class="sw" data-c="4"></i>NSW real wages</span></div></div>
       <div class="card" id="card-cpi"><h3>Consumer price index growth</h3><p class="note">All groups, per cent change through the year, quarterly</p><div class="chart dash-skeleton" id="ch-cpi" data-draw="ch-cpi" data-source="c_cpi_tty refs"></div><div class="legend"><span><i class="sw" data-c="0"></i>Sydney</span><span><i class="sw dash" data-c="1"></i>Eight capitals</span></div></div>
       <div class="card" id="card-housing"><h3>NSW housing pipeline against the Housing Accord</h3><p class="note">Dwellings, rolling 12-month totals: approvals by type, then commencements and completions (quarterly)</p><div class="chart tall dash-skeleton" id="ch-housing" data-draw="ch-housing" data-source="c_housing refs"></div><div class="legend"><span><i class="sw blk" data-c="0"></i>Approved houses</span><span><i class="sw blk" data-c="1"></i>Approved units and other</span><span><i class="sw" data-c="2"></i>Commencements</span><span><i class="sw" data-c="3"></i>Completions</span><span><i class="sw ref"></i>Accord pace</span></div></div>
@@ -460,9 +461,9 @@ table.tb.wrap td:nth-child(2), table.tb.wrap th:nth-child(2) { text-align: left;
 <script>
 // ---------- calculations (visible in Sources) ----------
 dash.calc('c_sfd_growth', {
-  inputs: ['abs_sfd_nsw'], title: 'NSW SFD growth, TTY',
-  description: 'Real state final demand, per cent change on the same quarter a year earlier.',
-  fn: (abs_sfd_nsw) => { const r = abs_sfd_nsw, g = (a, b) => (a == null || b == null) ? null : +((a / b - 1) * 100).toFixed(2); return r.slice(4).map((x, i) => ({ quarter: x.quarter, sa_tty: g(x.sfd_sa, r[i].sfd_sa), trend_tty: g(x.sfd_trend, r[i].sfd_trend) })); }
+  inputs: ['abs_sfd_nsw'], title: 'NSW SFD growth',
+  description: 'Real state final demand, per cent change on the same quarter a year earlier (TTY) and on the previous quarter, seasonally adjusted and trend.',
+  fn: (abs_sfd_nsw) => { const r = abs_sfd_nsw, g = (a, b) => (a == null || b == null) ? null : +((a / b - 1) * 100).toFixed(2); return r.slice(4).map((x, i) => ({ quarter: x.quarter, sa_tty: g(x.sfd_sa, r[i].sfd_sa), trend_tty: g(x.sfd_trend, r[i].sfd_trend), sa_qoq: g(x.sfd_sa, r[i + 3].sfd_sa), trend_qoq: g(x.sfd_trend, r[i + 3].sfd_trend) })); }
 });
 dash.calc('c_emp_growth', {
   inputs: ['abs_labour_nsw'], title: 'NSW employment growth, TTY',
@@ -523,6 +524,7 @@ dash.calc('c_state_compare', {
     const annAvg = (key, label) => { const g = by(abs_sfd_states), row = { indicator: label }; let lq = null; S.forEach(s => { const r = g.get(s) || []; if (r.length < 8) { row[s] = null; return; } const n = r.length; lq = r[n - 1].quarter; row[s] = +((sum(r.slice(n - 4), d => d[key]) / sum(r.slice(n - 8, n - 4), d => d[key]) - 1) * 100).toFixed(1); }); row.period = lq ? ql(lq) + ', annual avg' : null; row.nsw_rank = rank(row); out.push(row); };
     const latest = (rows, key, label, per, low, dp = 1) => { const g = by(rows), row = { indicator: label }; let lp = null; S.forEach(s => { const r = g.get(s) || [], x = r[r.length - 1]; if (x) lp = x.quarter || x.month; row[s] = x && x[key] != null ? +(+x[key]).toFixed(dp) : null; }); row.period = lp ? per(lp) : null; row.nsw_rank = rank(row, low); out.push(row); };
     annAvg('sfd_sa', 'State final demand, annual average growth %');
+    { const g = by(abs_sfd_states), row = { indicator: 'State final demand, quarterly growth %' }; let lq = null; S.forEach(s => { const r = g.get(s) || []; if (r.length < 2) { row[s] = null; return; } const n = r.length; lq = r[n - 1].quarter; row[s] = +((r[n - 1].sfd_sa / r[n - 2].sfd_sa - 1) * 100).toFixed(1); }); row.period = lq ? ql(lq) + ', seasonally adjusted' : null; row.nsw_rank = rank(row); out.push(row); }
     latest(abs_labour_states, 'unemp_sa', 'Unemployment rate %', ml, true);
     annAvg('business_investment_sa', 'Business investment, annual average growth %');
     latest(abs_wpi_states, 'wpi_tty', 'Wage price index, TTY growth %', ql, false);
@@ -566,7 +568,8 @@ dash.calc('c_fast', {
     const O = outlook.find(r => /Real gross state product/.test(r.indicator)), nk = 'y' + (+gyl.slice(0, 4) + 1) + '_' + String(+gyl.slice(5, 7) + 1).padStart(2, '0');
     add('gsp', pc(gs('NSW')), gyl + ', real (ABS)', 'Australia', pc(gs('AUS')), (+gyl.slice(0, 4) + 1) + '-' + String(+gyl.slice(5, 7) + 1).padStart(2, '0') + ' Treasury f', O && O[nk] != null ? O[nk] + '%' : 'n.a.', tone(gs('NSW') > gs('AUS'), gs('NSW') < gs('AUS')));
     const sf = abs_sfd_nsw, n = sf.length, s0 = g(sf[n - 1].sfd_sa, sf[n - 5].sfd_sa), s1 = g(sf[n - 2].sfd_sa, sf[n - 6].sfd_sa), s4 = g(sf[n - 5].sfd_sa, sf[n - 9].sfd_sa);
-    add('sfd', pc(s0), ql(sf[n - 1].quarter) + ', TTY', ql(sf[n - 2].quarter), pc(s1), ql(sf[n - 5].quarter), pc(s4), tone(s0 > s1, s0 < s1));
+    const sq = g(sf[n - 1].sfd_sa, sf[n - 2].sfd_sa);
+    add('sfd', pc(s0), ql(sf[n - 1].quarter) + ', TTY', ql(sf[n - 1].quarter) + ', quarterly', pc(sq), ql(sf[n - 2].quarter) + ', TTY', pc(s1), tone(s0 > s1, s0 < s1));
     const L = abs_labour_nsw, ln = L.length, l0 = L[ln - 1], l1 = L[ln - 2], l12 = L[ln - 13];
     add('unemp', pc(l0.unemp_sa), ml(l0.month) + ', seasonally adjusted', ml(l1.month), pc(l1.unemp_sa), ml(l12.month), pc(l12.unemp_sa), tone(+l0.unemp_sa.toFixed(1) < +l1.unemp_sa.toFixed(1), +l0.unemp_sa.toFixed(1) > +l1.unemp_sa.toFixed(1)));
     const e0 = g(l0.emp_sa, l12.emp_sa), e1 = g(l1.emp_sa, L[ln - 14].emp_sa), e12 = g(l12.emp_sa, L[ln - 25].emp_sa);
@@ -769,6 +772,7 @@ function chartDraw(name, deps, draw) {
 }
 function tableDraw(name, deps, fill) { dash.draw(name, (tb) => { if (ok(...deps)) fill(tb); else tb.replaceChildren(); }); }
 
+chartDraw('ch-sfd-q', ['c_sfd_growth'], b => barChart(b, D('c_sfd_growth').data.slice(-12), { x: 'quarter', pad: 0.25, labels: true, series: [{ key: 'sa_qoq', c: 0, label: 'Seasonally adjusted', label_values: true, color: (v) => v < 0 ? 'var(--cds-chart-status-critical)' : col(0) }], fmt: v => d3.format('.1f')(v), lfmt: v => d3.format('.1f')(v), xlab: q => q.endsWith('Q2') || q.endsWith('Q4') ? MON[(+q.slice(-1)) * 3 - 1] + ' ' + q.slice(2, 4) : '', tlab: lab, tfmt: v => pct1(v) + '%' }));
 chartDraw('ch-sfd', ['c_sfd_growth'], b => lineChart(b, D('c_sfd_growth').data, { x: 'quarter', from: '2016-03', zero: true, series: [{ key: 'sa_tty', c: 0, label: 'Seasonally adjusted' }, { key: 'trend_tty', c: 1, dash: true, label: 'Trend' }], tfmt: v => pct1(v) + '%' }));
 chartDraw('ch-wages', ['c_wages'], b => lineChart(b, D('c_wages').data, { x: 'quarter', from: '2016-03', zero: true, series: [{ key: 'nsw', c: 0, label: 'NSW' }, { key: 'nsw_private', c: 2, label: 'NSW private' }, { key: 'nsw_public', c: 3, label: 'NSW public' }, { key: 'aus', c: 1, dash: true, label: 'Australia' }, { key: 'real', c: 4, label: 'NSW real wages' }], tfmt: v => pct1(v) + '%' }));
 chartDraw('ch-cpi', ['c_cpi_tty'], b => lineChart(b, D('c_cpi_tty').data, { x: 'quarter', from: '2016-03', series: [{ key: 'sydney', c: 0, label: 'Sydney' }, { key: 'capitals', c: 1, dash: true, label: 'Eight capitals' }], tfmt: v => pct1(v) + '%' }));
