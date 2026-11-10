@@ -568,8 +568,8 @@ dash.calc('c_fast', {
     const O = outlook.find(r => /Real gross state product/.test(r.indicator)), nk = 'y' + (+gyl.slice(0, 4) + 1) + '_' + String(+gyl.slice(5, 7) + 1).padStart(2, '0');
     add('gsp', pc(gs('NSW')), gyl + ', real (ABS)', 'Australia', pc(gs('AUS')), (+gyl.slice(0, 4) + 1) + '-' + String(+gyl.slice(5, 7) + 1).padStart(2, '0') + ' Treasury f', O && O[nk] != null ? O[nk] + '%' : 'n.a.', tone(gs('NSW') > gs('AUS'), gs('NSW') < gs('AUS')));
     const sf = abs_sfd_nsw, n = sf.length, s0 = g(sf[n - 1].sfd_sa, sf[n - 5].sfd_sa), s1 = g(sf[n - 2].sfd_sa, sf[n - 6].sfd_sa), s4 = g(sf[n - 5].sfd_sa, sf[n - 9].sfd_sa);
-    const sq = g(sf[n - 1].sfd_sa, sf[n - 2].sfd_sa);
-    add('sfd', pc(s0), ql(sf[n - 1].quarter) + ', TTY', ql(sf[n - 1].quarter) + ', quarterly', pc(sq), ql(sf[n - 2].quarter) + ', TTY', pc(s1), tone(s0 > s1, s0 < s1));
+    const q = k => g(sf[k].sfd_sa, sf[k - 1].sfd_sa), wq = (t, k) => pc(t) + ' (' + pc(q(k)) + ')';
+    add('sfd', wq(s0, n - 1), ql(sf[n - 1].quarter) + ', TTY (quarterly)', ql(sf[n - 2].quarter), wq(s1, n - 2), ql(sf[n - 5].quarter), wq(s4, n - 5), tone(s0 > s1, s0 < s1));
     const L = abs_labour_nsw, ln = L.length, l0 = L[ln - 1], l1 = L[ln - 2], l12 = L[ln - 13];
     add('unemp', pc(l0.unemp_sa), ml(l0.month) + ', seasonally adjusted', ml(l1.month), pc(l1.unemp_sa), ml(l12.month), pc(l12.unemp_sa), tone(+l0.unemp_sa.toFixed(1) < +l1.unemp_sa.toFixed(1), +l0.unemp_sa.toFixed(1) > +l1.unemp_sa.toFixed(1)));
     const e0 = g(l0.emp_sa, l12.emp_sa), e1 = g(l1.emp_sa, L[ln - 14].emp_sa), e12 = g(l12.emp_sa, L[ln - 25].emp_sa);
