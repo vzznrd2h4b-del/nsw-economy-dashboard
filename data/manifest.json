@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-10T11:01:56Z",
+ "generated": "2026-11-10T21:13:13Z",
  "datasets": {
   "abs_approvals_nsw": {
    "title": "NSW dwelling approvals by type",
@@ -213,10 +213,10 @@
   },
   "jur_budget": {
    "title": "Jurisdictions compared, 2026-27 budgets",
-   "description": "Commonwealth, state and territory 2026-27 Budget figures ($m): revenue, taxation, expenses, net operating balance, net and gross debt at 30 June 2027, infrastructure spending and GSP or GDP, general government sector unless noted, each with its source table and caveats.",
-   "updated": "2026-11-10T00:00:00Z",
+   "description": "Commonwealth, state and territory 2026-27 Budget figures ($m): revenue, taxation, expenses, net operating balance, net and gross debt at 30 June 2027, infrastructure spending, GSP or GDP, and ABS estimated resident population at 31 March 2026, general government sector unless noted, each with its source table and caveats.",
+   "updated": "2026-11-10T21:15:00Z",
    "schedule": "Fixed to the 2026-27 budgets; rebuilt when governments publish new budgets or mid-year updates. The daily refresh checks for them.",
-   "blob": "ad3f8d3fd7b9525c785a728fa79806e9"
+   "blob": "97cae4a5baf56460ae67fd0c5d58c8bc"
   },
   "jur_growth": {
    "title": "Tax and expense growth since 2022-23",
@@ -231,6 +231,13 @@
    "updated": "2026-11-10T00:00:00Z",
    "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when an agency announces a rating action.",
    "blob": "e45274c7c1b7a8f98863bbcfada02eaa"
+  },
+  "jur_workforce": {
+   "title": "Public sector employee jobs by jurisdiction",
+   "description": "ABS Employment and Earnings, Public Sector, Australia, 2025-26 (released 5 November 2026): employee jobs ('000) in June 2023, 2024, 2025 and 2026 for each state and territory government and for the Commonwealth Government (including defence force personnel).",
+   "updated": "2026-11-10T21:15:00Z",
+   "schedule": "Annual: the ABS publishes the next edition (2026-27) in November 2027.",
+   "blob": "845a17cf68830b8aed9f4b8f12a72e1b"
   },
   "nab_survey": {
    "title": "NAB business survey",
