@@ -6,7 +6,7 @@ A public website showing the NSW economy and state budget in one place: jobs, pr
 
 - `index.html` is the page. It draws every figure and chart from the files in `data/` using [d3](https://d3js.org), with a small loader in `assets/dash.js`.
 - `data/<source>.json` holds one data source each. `data/manifest.json` lists every source with its description and the time it was last updated.
-- A scheduled refresh checks each source every day at 11:52am Sydney time (after the ABS's 11:30am release slot) and commits any new figures here. GitHub Pages republishes the site automatically after each commit.
+- A scheduled refresh checks each source every weekday at 11:45am Sydney time (after the ABS's 11:30am release slot) and commits any new figures here. GitHub Pages republishes the site automatically after each commit.
 
 ## Sources
 
