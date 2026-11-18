@@ -1,5 +1,5 @@
 {
- "generated": "2026-11-18T01:21:34Z",
+ "generated": "2026-11-18T01:29:12Z",
  "datasets": {
   "abs_approvals_nsw": {
    "title": "NSW dwelling approvals by type",
@@ -66,10 +66,10 @@
   },
   "abs_gsp_states": {
    "title": "Gross state product by state",
-   "description": "ABS Australian National Accounts: State Accounts: real gross state product growth and GSP per capita growth by state and territory, latest financial year (2024-25, released 20 November 2025).",
-   "updated": "2026-11-18T01:05:00Z",
+   "description": "ABS Australian National Accounts: State Accounts: real gross state product growth and GSP per capita growth by state and territory, 2025-26 (released 18 November 2026) and 2024-25. 2024-25 GSP growth is as revised in the 2025-26 release; 2024-25 per capita growth is as first published (20 November 2025), because the new release does not restate it.",
+   "updated": "2026-11-18T01:28:34Z",
    "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
-   "blob": "efabc7e67be990c1f273f38cef5205ab"
+   "blob": "67a197bc0197b26694eaef4131826900"
   },
   "abs_interstate": {
    "title": "NSW interstate migration",
@@ -137,23 +137,23 @@
   "abs_wpi": {
    "title": "Wage price index growth",
    "description": "ABS Wage Price Index (dataflow WPI): total hourly rates of pay excluding bonuses, through-the-year per cent change, original: NSW all sectors, NSW private, NSW public and Australia, quarterly from 2015.",
-   "updated": "2026-11-18T01:05:00Z",
+   "updated": "2026-11-18T01:28:34Z",
    "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
-   "blob": "9456526d802a0ce3668abb8877968054"
+   "blob": "1160d996a2e2eeccd1ba9e90ae8dddce"
   },
   "abs_wpi_states": {
    "title": "Wage growth by state",
    "description": "ABS Wage Price Index (dataflow WPI): through-the-year per cent change, all sectors, by state and Australia, latest eight quarters.",
-   "updated": "2026-11-18T01:05:00Z",
+   "updated": "2026-11-18T01:28:34Z",
    "schedule": "Checked every day at 11:52am Sydney time by the scheduled refresh, and updated when the publisher releases new figures.",
-   "blob": "e14b8d0daeec164d3b7e17f67ceca571"
+   "blob": "6c9ba5323e25bf1523248e358cbf9f83"
   },
   "asic_insolvency": {
    "title": "ASIC company insolvencies",
    "description": "ASIC insolvency statistics Series 1, Table 1.3: companies entering external administration for the first time, NSW and Australia, by month.",
-   "updated": "2026-11-11T01:24:19Z",
+   "updated": "2026-11-18T01:24:24Z",
    "schedule": "Checked each weekday at 12:23pm Sydney time through the Claude desktop app on your computer; ASIC publishes monthly.",
-   "blob": "b97ea7704ab79766a7283a423b1d55f4"
+   "blob": "f9ac950784f46d0006445734d9cda975"
   },
   "bond10": {
    "title": "10-year bond yield, monthly",
